@@ -3,143 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Latiao CRM Ultimate PRO | Full Control ❄️</title>
+    <title>Latiao CRM PRO | Deluxe Edition ❄️</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --accent: #e62117; --accent-glow: rgba(230, 33, 23, 0.12); --chrome-bg: #dfe1e5; --chrome-tab: #ffffff; --sidebar-bg: #f8f9fa; --border: #e8eaed; --gold: #ffd700; }
+        :root { 
+            --accent: #e62117; 
+            --accent-glow: rgba(230, 33, 23, 0.08); 
+            --chrome-bg: #dfe1e5; 
+            --chrome-tab: #ffffff; 
+            --sidebar-bg: #f8f9fa; 
+            --border: #e8eaed; 
+            --gold: #ffd700;
+            --glass: rgba(255, 255, 255, 0.8);
+        }
+
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; position: fixed; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--chrome-bg); display: flex; flex-direction: column; }
 
-        /* SNOW */
-        .snowflake { position: fixed; top: -10%; z-index: 9999; color: #fff; font-size: 1em; user-select: none; pointer-events: none; animation: snow-fall 10s linear infinite; }
+        /* ANIMATIONS */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes snow-fall { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(110vh); opacity: 0; } }
 
+        .snowflake { position: fixed; top: -10%; z-index: 9999; color: #fff; font-size: 1em; pointer-events: none; animation: snow-fall 10s linear infinite; }
+
         /* AUTH SCREEN */
-        #auth-screen { position: fixed; inset: 0; background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1543589077-47d81606c1bf?q=80&w=1470&auto=format&fit=crop'); background-size: cover; background-position: center; z-index: 999999; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .auth-card { width: 100%; max-width: 360px; text-align: center; background: rgba(255, 255, 255, 0.95); padding: 40px 30px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 2px solid var(--gold); position: relative; }
-        .auth-card::before { content: '🎄'; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); font-size: 50px; }
-        .auth-input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 12px; font-size: 16px; }
-        .auth-btn { width: 100%; padding: 14px; background: var(--accent); color: #fff; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        #auth-screen { position: fixed; inset: 0; background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1543589077-47d81606c1bf?q=80&w=1470&auto=format&fit=crop'); background-size: cover; z-index: 999999; display: flex; align-items: center; justify-content: center; }
+        .auth-card { width: 360px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 40px; border-radius: 30px; text-align: center; border: 2px solid var(--gold); animation: fadeIn 0.5s ease; }
+        .auth-input { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 15px; border: 1px solid #ddd; transition: 0.3s; }
+        .auth-input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
+        .auth-btn { width: 100%; padding: 15px; background: var(--accent); color: #fff; border: none; border-radius: 15px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .auth-btn:active { transform: scale(0.96); }
 
-        /* CRM UI */
-        #crm-ui { display: none; height: 100%; flex-direction: column; position: relative; }
-        .christmas-decor { position: absolute; top: 0; left: 0; width: 100%; height: 50px; background: url('https://www.transparentpng.com/download/christmas-decoration/pine-branches-with-ornaments-christmas-decoration-png-19.png'); background-size: contain; background-repeat: repeat-x; z-index: 1001; pointer-events: none; opacity: 0.8; }
+        /* UI */
+        #crm-ui { display: none; height: 100%; flex-direction: column; }
+        .chrome-header { display: flex; align-items: flex-end; padding: 8px 8px 0; background: var(--chrome-bg); border-bottom: 1px solid #c1c3c8; gap: 4px; flex-shrink: 0; }
+        .tab { padding: 10px 20px; min-width: 140px; height: 38px; border-radius: 12px 12px 0 0; cursor: pointer; font-size: 13px; font-weight: 600; color: #555; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .tab.active { background: #fff; color: var(--accent); box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+
+        .app-shell { flex: 1; display: flex; background: #fff; overflow: hidden; }
+        .sidebar { width: 340px; border-right: 1px solid var(--border); background: var(--sidebar-bg); display: flex; flex-direction: column; }
         
-        .chrome-header { display: flex; align-items: flex-end; padding: 8px 8px 0; gap: 4px; background: var(--chrome-bg); border-bottom: 1px solid #c1c3c8; flex-shrink: 0; z-index: 1002; }
-        .tab { position: relative; padding: 10px 15px; min-width: 60px; height: 38px; background: transparent; border-radius: 12px 12px 0 0; cursor: pointer; font-size: 13px; font-weight: 600; color: #5f6368; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .tab.active { background: var(--chrome-tab); color: var(--accent); }
-        @media (min-width: 768px) { .tab { min-width: 160px; justify-content: flex-start; } .tab span { display: inline; } }
+        .chat-item { 
+            padding: 15px; border-radius: 20px; margin: 8px; background: #fff; border: 1px solid #eee; 
+            cursor: pointer; position: relative; transition: 0.3s; animation: slideIn 0.3s ease forwards;
+        }
+        .chat-item:hover { transform: translateX(5px); border-color: var(--accent); }
+        .chat-item.active-chat { background: var(--accent-glow); border-color: var(--accent); }
+        .tag-mgr { position: absolute; right: 12px; top: 12px; font-size: 9px; padding: 3px 8px; border-radius: 6px; background: #007aff; color: #fff; font-weight: 800; }
 
-        .app-shell { flex: 1; display: flex; background: #fff; overflow: hidden; position: relative; }
-        
-        /* SIDEBAR & ADAPTIVE */
-        .sidebar { width: 100%; height: 100%; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: absolute; z-index: 100; transition: transform 0.3s ease; }
-        .sidebar.hidden { transform: translateX(-100%); }
-        @media (min-width: 992px) { .sidebar { position: relative; width: 340px; transform: none !important; } }
-
-        /* CHAT LIST */
-        .chat-list { flex: 1; overflow-y: auto; padding: 10px; }
-        .chat-item { padding: 12px; border-radius: 15px; margin-bottom: 8px; background: #fff; border: 1px solid #eee; cursor: pointer; position: relative; }
-        .chat-item.active-chat { border-color: var(--accent); background: var(--accent-glow); }
-        .tag-mgr { position: absolute; top: 10px; right: 10px; font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #007aff; color: #fff; }
-
-        /* VIEWPORT */
-        .viewport { flex: 1; display: flex; flex-direction: column; background: #fff; height: 100%; }
-        .top-nav { padding: 10px 15px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; background: #fff; }
-        
-        .msg-area { flex: 1; padding: 15px; overflow-y: auto; background: #f4f6f8; display: flex; flex-direction: column; gap: 8px; }
-        .bubble { padding: 12px 16px; border-radius: 18px; max-width: 85%; font-size: 14px; }
-        .bubble.in { align-self: flex-start; background: #fff; border: 1px solid #eee; }
+        /* MESSAGES */
+        .viewport { flex: 1; display: flex; flex-direction: column; background: #fff; }
+        .msg-area { flex: 1; padding: 20px; overflow-y: auto; background: #f0f2f5; display: flex; flex-direction: column; gap: 10px; }
+        .bubble { padding: 12px 18px; border-radius: 22px; max-width: 75%; font-size: 14px; animation: fadeIn 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .bubble.in { align-self: flex-start; background: #fff; border-bottom-left-radius: 4px; }
         .bubble.out { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
-        .bubble.sys { align-self: center; background: #cbd5e1; font-size: 10px; font-weight: 800; color: #1e293b; border-radius: 8px; }
+        .bubble.sys { align-self: center; background: #cbd5e1; font-size: 10px; font-weight: 800; padding: 5px 15px; }
 
-        .scripts-bar { display: flex; gap: 8px; overflow-x: auto; padding: 10px; background: #fff; border-top: 1px solid var(--border); scrollbar-width: none; }
-        .script-btn { flex-shrink: 0; padding: 8px 14px; background: #f1f3f4; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid #ddd; }
+        .scripts-bar { display: flex; gap: 8px; overflow-x: auto; padding: 12px; border-top: 1px solid #eee; scrollbar-width: none; }
+        .script-btn { flex-shrink: 0; padding: 8px 16px; background: #fff; border: 1px solid #ddd; border-radius: 12px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .script-btn:active { transform: scale(0.9); background: #eee; }
 
-        .footer { padding: 10px; border-top: 1px solid var(--border); display: flex; gap: 10px; background: #fff; }
-        .footer input { flex: 1; height: 44px; padding: 0 18px; border-radius: 22px; border: 1px solid #eee; background: #f5f5f5; font-size: 16px; }
+        .footer { padding: 15px; display: flex; gap: 12px; border-top: 1px solid #eee; }
+        .footer input { flex: 1; padding: 14px 20px; border-radius: 25px; border: 1px solid #eee; background: #f5f5f5; font-size: 15px; transition: 0.3s; }
+        .footer input:focus { background: #fff; border-color: var(--accent); }
 
-        .settings-area { padding: 20px; overflow-y: auto; height: 100%; background: #f9f9fb; }
-        .set-card { background: #fff; border-radius: 20px; border: 1px solid var(--border); padding: 20px; margin-bottom: 20px; }
-        .hidden-tab { display: none !important; }
+        .set-card { background: #fff; padding: 25px; border-radius: 25px; border: 1px solid #eee; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+
+        /* MOBILE ADAPTIVITY */
+        @media (max-width: 992px) {
+            .sidebar { width: 100%; position: absolute; inset: 0; z-index: 100; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+            .sidebar.hidden { transform: translateX(-100%); }
+        }
     </style>
 </head>
-<body>
+<body onclick="playClick()">
+
+    <audio id="snd-click" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
+    <audio id="snd-send" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3" preload="auto"></audio>
 
     <div id="snow-container"></div>
 
     <div id="auth-screen">
         <div class="auth-card">
-            <h2 style="color:var(--accent)">Latiao CRM</h2>
-            <p style="color:#666; font-size:13px; margin-bottom:20px;">🎄 Зимовий Сезон 2026 ❄️</p>
+            <h2 style="color:var(--accent); margin:0 0 10px 0;">Latiao CRM</h2>
+            <p style="font-size:13px; color:#666; margin-bottom:30px;">Зимовий сезон 2026 ❄️</p>
             <input type="text" id="auth-l" class="auth-input" placeholder="Логін">
             <input type="password" id="auth-p" class="auth-input" placeholder="Пароль">
-            <button class="auth-btn" onclick="tryLogin()">УВІЙТИ</button>
+            <button class="auth-btn" onclick="tryLogin()">УВІЙТИ В СИСТЕМУ</button>
         </div>
     </div>
 
     <div id="crm-ui">
-        <div class="christmas-decor"></div>
         <header class="chrome-header">
-            <div class="tab active" onclick="nav('support', this)"><i>💬</i> <span>Підтримка</span> <b id="chat-count" style="margin-left:5px">0</b></div>
-            <div id="t-comm" class="tab" onclick="nav('community', this)"><i>🌶️</i> <span>Спільнота</span></div>
-            <div id="t-set" class="tab" onclick="nav('settings', this)"><i>⚙️</i> <span>Налаштування</span></div>
+            <div class="tab active" onclick="nav('support', this)"><span>💬 Підтримка</span> <b id="chat-count" style="margin-left:5px">0</b></div>
+            <div id="t-set" class="tab" onclick="nav('settings', this)"><span>⚙️ Налаштування</span></div>
         </header>
 
         <div class="app-shell">
             <aside class="sidebar" id="side-panel">
-                <div style="padding:15px; border-bottom:1px solid #eee; background:#fff;">
-                    <div id="greeting-txt" style="font-weight:800; font-size:12px; color:#1a1a1a;"></div>
-                    <div style="display:flex; gap:5px; margin-top:10px">
-                        <button class="auth-btn" style="padding:5px; font-size:10px; flex:1" onclick="setMode('active')">АКТИВНІ</button>
-                        <button class="auth-btn" style="padding:5px; font-size:10px; flex:1; background:#666" onclick="setMode('archived')">АРХІВ</button>
+                <div style="padding:20px; border-bottom:1px solid #eee; background:#fff">
+                    <div id="greeting-txt" style="font-weight:800; font-size:13px;"></div>
+                    <div style="display:flex; gap:8px; margin-top:15px">
+                        <button class="auth-btn" style="padding:8px; font-size:11px; flex:1" onclick="setMode('active')">АКТИВНІ</button>
+                        <button class="auth-btn" style="padding:8px; font-size:11px; flex:1; background:#666" onclick="setMode('archived')">АРХІВ</button>
                     </div>
                 </div>
-                <div id="chat-list" class="chat-list"></div>
-                <button onclick="logout()" style="padding:15px; color:red; border:none; background:none; font-weight:bold; cursor:pointer;">🚪 Вийти</button>
+                <div id="chat-list" class="chat-list" style="flex:1; overflow-y:auto"></div>
+                <button onclick="logout()" style="padding:20px; color:red; border:none; background:none; font-weight:bold; cursor:pointer; width:100%; text-align:center;">🚪 Завершити роботу</button>
             </aside>
 
             <main class="viewport view-tab active" id="view-support">
                 <div class="top-nav">
-                    <button class="auth-btn" style="width:35px; height:35px; padding:0; background:#000;" onclick="document.getElementById('side-panel').classList.remove('hidden')">‹</button>
-                    <b id="active-user-name" style="font-size:14px">Оберіть чат</b>
+                    <button class="auth-btn" style="width:40px; height:40px; padding:0; background:#000; display:none" id="m-back" onclick="toggleSidebar(false)">‹</button>
+                    <b id="active-user-name" style="font-size:14px; margin-left:10px">Оберіть чат</b>
                     <button style="margin-left:auto; border:none; background:none; color:var(--accent); font-weight:800; cursor:pointer;" onclick="archiveChat()">ЗАКРИТИ</button>
                 </div>
                 <div class="msg-area" id="support-msgs"></div>
                 <div id="scripts-chat-bar" class="scripts-bar"></div>
                 <form class="footer" onsubmit="sendMsg(event)">
-                    <input type="text" id="msg-input" placeholder="Відповідь..." autocomplete="off">
-                    <button type="submit" style="background:#000; color:#fff; border:none; width:44px; height:44px; border-radius:50%; cursor:pointer;">➤</button>
+                    <input type="text" id="msg-input" placeholder="Ваша відповідь..." autocomplete="off">
+                    <button type="submit" style="background:#000; color:#fff; border:none; width:46px; height:46px; border-radius:50%; cursor:pointer; transition:0.2s;" id="send-btn">➤</button>
                 </form>
             </main>
 
-            <main class="viewport view-tab" id="view-settings" style="display:none;">
-                <div class="settings-area">
-                    <div class="set-card" id="admin-only-mgr">
-                        <h4>👥 Менеджери та Telegram ID</h4>
-                        <div id="mgr-list"></div>
-                        <hr>
-                        <input type="text" id="n-m-name" class="auth-input" placeholder="Ім'я">
-                        <input type="text" id="n-m-log" class="auth-input" placeholder="Логін">
-                        <input type="text" id="n-m-pas" class="auth-input" placeholder="Пароль">
-                        <input type="text" id="n-m-tg" class="auth-input" placeholder="Telegram Chat ID">
-                        <button class="auth-btn" onclick="addMgr()">Додати доступ</button>
-                    </div>
-                    <div class="set-card">
-                        <h4>🤖 FAQ (Віджет клієнта)</h4>
-                        <div id="faq-editor"></div>
-                        <button class="auth-btn" style="background:#007aff" onclick="addFAQRow()">+ Додати FAQ</button>
-                        <button class="auth-btn" style="margin-top:10px" onclick="saveCfg('faq')">Зберегти FAQ</button>
-                    </div>
-                    <div class="set-card">
-                        <h4>📝 Скрипти (Швидкі відповіді)</h4>
-                        <div id="script-editor"></div>
-                        <button class="auth-btn" style="background:#007aff" onclick="addScriptRow()">+ Додати скрипт</button>
-                        <button class="auth-btn" style="margin-top:10px" onclick="saveCfg('scripts')">Зберегти скрипти</button>
-                    </div>
+            <main class="viewport view-tab" id="view-settings" style="display:none; padding:20px; overflow-y:auto;">
+                <div class="set-card" id="admin-only-mgr">
+                    <h4>🤶 Керування менеджерами</h4>
+                    <div id="mgr-list"></div>
+                    <hr style="margin:20px 0; border:none; border-top:1px solid #eee">
+                    <input type="text" id="n-m-name" class="auth-input" placeholder="Ім'я">
+                    <input type="text" id="n-m-log" class="auth-input" placeholder="Логін">
+                    <input type="text" id="n-m-pas" class="auth-input" placeholder="Пароль">
+                    <input type="text" id="n-m-tg" class="auth-input" placeholder="Telegram Chat ID">
+                    <button class="auth-btn" onclick="addMgr()">СТВОРИТИ МЕНЕДЖЕРА</button>
+                </div>
+                <div class="set-card">
+                    <h4>🤖 FAQ та Скрипти</h4>
+                    <button class="auth-btn" onclick="addFAQRow()">+ Нове Питання</button>
+                    <button class="auth-btn" style="margin-top:10px" onclick="addScriptRow()">+ Новий Скрипт</button>
+                    <button class="auth-btn" style="margin-top:20px; background:#000" onclick="saveAllConfig()">ЗБЕРЕГТИ ВСЕ</button>
+                    <div id="config-editor" style="margin-top:20px"></div>
                 </div>
             </main>
         </div>
@@ -154,7 +161,11 @@
     let user = JSON.parse(localStorage.getItem('user'));
     let curId = null, mode = 'active', managers = {}, scripts = [], faqs = [];
 
-    // SNOW
+    // SOUND FUNCTIONS
+    function playClick() { document.getElementById('snd-click').currentTime=0; document.getElementById('snd-click').play().catch(()=>{}); }
+    function playSend() { document.getElementById('snd-send').currentTime=0; document.getElementById('snd-send').play().catch(()=>{}); }
+
+    // SNOW EFFECT
     for(let i=0;i<25;i++){
         let s=document.createElement('div'); s.className='snowflake'; s.innerHTML='❄';
         s.style.left=Math.random()*100+'vw'; s.style.animationDuration=(Math.random()*5+5)+'s';
@@ -170,7 +181,7 @@
                 const d=m.val();
                 if(d.login===l && d.pass===p) { loginOk({name:d.name, role:'manager', id:m.key, tgId:d.tgId}); f=true; }
             });
-            if(!f) alert('Помилка входу');
+            if(!f) alert('Помилка авторизації');
         });
     }
 
@@ -181,54 +192,36 @@
         document.getElementById('auth-screen').style.display='none';
         document.getElementById('crm-ui').style.display='flex';
         const hr = new Date().getHours();
-        const gr = hr<12?"Доброго ранку":hr<18?"Доброго дня":"Доброго вечора";
-        document.getElementById('greeting-txt').innerText = `${gr}, ${user.name}! 🎄`;
-        if(user.role !== 'admin') {
-            document.getElementById('t-comm').style.display='none';
-            document.getElementById('t-set').style.display='none';
-        }
+        document.getElementById('greeting-txt').innerText = `${hr<12?"Доброго ранку":hr<18?"Доброго дня":"Доброго вечора"}, ${user.name}! 🎄`;
+        if(user.role !== 'admin') document.getElementById('t-set').style.display='none';
+        if(window.innerWidth < 992) document.getElementById('m-back').style.display='block';
         init();
     }
 
     function init() {
-        db.ref('managers').on('value', snap => { 
-            managers = snap.val() || {}; 
-            if(user.role==='admin') renderMgrList(); 
-            loadList(); 
-        });
-
+        db.ref('managers').on('value', snap => { managers = snap.val() || {}; if(user.role==='admin') renderMgrList(); loadList(); });
         db.ref('config').on('value', snap => {
             const cfg = snap.val() || {};
-            scripts = cfg.scripts || [];
-            faqs = cfg.faq || [];
-            renderScriptsInChat();
-            if(user.role==='admin') renderCfgEditors();
+            scripts = cfg.scripts || []; faqs = cfg.faq || [];
+            renderScriptsToChat();
+            if(user.role==='admin') renderConfigEditors();
         });
-
         db.ref('active_chats').on('value', snap => {
             document.getElementById('chat-count').innerText = snap.numChildren();
             smartAssign(snap.val());
             loadList();
         });
-
-        setInterval(checkEscalation, 60000); // 1хв чек
+        setInterval(checkEscalation, 60000);
     }
 
-    // SMART ASSIGN & ESCALATION
+    // SMART LOGIC
     function smartAssign(chats) {
-        if(!chats) return;
-        const hr = new Date().getHours();
-        if(hr >= 0 && hr < 8) return; // Ніч
-
-        const available = Object.keys(managers).filter(id => managers[id].tgId);
-        if(user.role==='admin') available.push('admin');
-        if(available.length === 0) return;
-
+        if(!chats || new Date().getHours() < 8) return;
+        const av = Object.keys(managers).filter(id => managers[id].tgId);
+        if(user.role==='admin') av.push('admin');
+        if(av.length === 0) return;
         Object.keys(chats).forEach(cid => {
-            if(!chats[cid].assignedTo) {
-                const rand = available[Math.floor(Math.random() * available.length)];
-                assign(cid, rand, "Автопризначення");
-            }
+            if(!chats[cid].assignedTo) assign(cid, av[Math.floor(Math.random()*av.length)], "Авто-черга");
         });
     }
 
@@ -237,10 +230,8 @@
         db.ref('active_chats').once('value', snap => {
             snap.forEach(c => {
                 const d = c.val();
-                if(d.assignedTo && d.assignedTo !== 'admin' && d.lastClientMsgTs) {
-                    if((now - d.lastClientMsgTs) > 300000) { // 5 хв
-                        assign(c.key, 'admin', "⚠️ Ескалація (5хв без відповіді)");
-                    }
+                if(d.assignedTo && d.assignedTo !== 'admin' && d.lastClientMsgTs && (now - d.lastClientMsgTs) > 300000) {
+                    assign(c.key, 'admin', "⚠️ Пропущено 5хв! Власник підключений");
                 }
             });
         });
@@ -257,7 +248,9 @@
         });
     }
 
-    // CRM LOGIC
+    // UI RENDERERS
+    function toggleSidebar(show) { document.getElementById('side-panel').classList.toggle('hidden', !show); }
+
     function loadList() {
         const path = mode==='active'?'active_chats':'closed_chats';
         db.ref(path).once('value', snap => {
@@ -265,22 +258,15 @@
             snap.forEach(c => {
                 const d = c.val();
                 if(user.role==='manager' && d.assignedTo && d.assignedTo !== user.id) return;
-                
                 const div = document.createElement('div');
                 div.className = `chat-item ${curId===c.key?'active-chat':''}`;
-                const mName = d.assignedTo==='admin'?'Босс':(managers[d.assignedTo]?.name || '—');
+                const mName = d.assignedTo==='admin'?'Босс':(managers[d.assignedTo]?.name || 'Вільний');
                 div.innerHTML = `<strong>👤 ${c.key.substring(0,8)}</strong><br><small>${d.lastMsg||'...'}</small>
                                  ${d.assignedTo?`<span class="tag-mgr">${mName}</span>`:''}`;
-                
-                if(user.role==='admin') {
-                    const sel = document.createElement('select');
-                    sel.innerHTML = `<option value="">Перепризначити...</option><option value="admin">Босс</option>`;
-                    Object.keys(managers).forEach(mId => sel.innerHTML += `<option value="${mId}">${managers[mId].name}</option>`);
-                    sel.onchange = (e) => assign(c.key, e.target.value, "Перепризначено Власником");
-                    sel.onclick = (e) => e.stopPropagation();
-                    div.appendChild(sel);
-                }
-                div.onclick = () => { curId=c.key; openChat(c.key); if(window.innerWidth<992) document.getElementById('side-panel').classList.add('hidden'); };
+                div.onclick = () => { 
+                    curId=c.key; openChat(c.key); 
+                    if(window.innerWidth<992) toggleSidebar(false); 
+                };
                 list.appendChild(div);
             });
         });
@@ -300,58 +286,50 @@
     }
 
     function sendMsg(e) {
-        e.preventDefault(); const i = document.getElementById('msg-input');
+        if(e) e.preventDefault(); 
+        const i = document.getElementById('msg-input');
         if(!curId || !i.value) return;
+        playSend();
         db.ref('support/'+curId).push({ text: i.value, type: 'out', ts: Date.now() });
-        db.ref('active_chats/'+curId).update({ lastMsg: "Менеджер: "+i.value, lastClientMsgTs: null });
+        db.ref('active_chats/'+curId).update({ lastMsg: "Відповідь: "+i.value, lastClientMsgTs: null });
         i.value = '';
     }
 
-    function renderScriptsInChat() {
+    function renderScriptsToChat() {
         const bar = document.getElementById('scripts-chat-bar'); bar.innerHTML = '';
         scripts.forEach(s => {
             const btn = document.createElement('button'); btn.className = 'script-btn'; btn.innerText = s.title;
-            btn.onclick = () => { document.getElementById('msg-input').value = s.text; document.getElementById('msg-input').focus(); };
+            btn.onclick = (e) => { e.stopPropagation(); document.getElementById('msg-input').value = s.text; };
             bar.appendChild(btn);
         });
     }
 
-    // SETTINGS RENDERERS
-    function renderCfgEditors() {
-        const faqArea = document.getElementById('faq-editor'); faqArea.innerHTML = '';
+    function renderConfigEditors() {
+        const area = document.getElementById('config-editor'); area.innerHTML = '';
         faqs.forEach((f, i) => {
-            faqArea.innerHTML += `<div class="auth-input" style="height:auto; margin-bottom:10px;">
-                <input class="auth-input" value="${f.q}" onchange="faqs[${i}].q=this.value" placeholder="Питання">
-                <textarea class="auth-input" onchange="faqs[${i}].a=this.value">${f.a}</textarea>
-                <button onclick="faqs.splice(${i},1);renderCfgEditors()" style="color:red;border:none;background:none;">Видалити</button>
-            </div>`;
+            area.innerHTML += `<div class="set-card"><b>FAQ Питання:</b><input class="auth-input" value="${f.q}" onchange="faqs[${i}].q=this.value"><textarea class="auth-input" onchange="faqs[${i}].a=this.value">${f.a}</textarea><button onclick="faqs.splice(${i},1);renderConfigEditors()" style="color:red;border:none;background:none;">Видалити</button></div>`;
         });
-        const scrArea = document.getElementById('script-editor'); scrArea.innerHTML = '';
         scripts.forEach((s, i) => {
-            scrArea.innerHTML += `<div class="auth-input" style="height:auto; margin-bottom:10px;">
-                <input class="auth-input" value="${s.title}" onchange="scripts[${i}].title=this.value" placeholder="Назва">
-                <textarea class="auth-input" onchange="scripts[${i}].text=this.value">${s.text}</textarea>
-                <button onclick="scripts.splice(${i},1);renderCfgEditors()" style="color:red;border:none;background:none;">Видалити</button>
-            </div>`;
+            area.innerHTML += `<div class="set-card"><b>Скрипт Адміна:</b><input class="auth-input" value="${s.title}" onchange="scripts[${i}].title=this.value"><textarea class="auth-input" onchange="scripts[${i}].text=this.value">${s.text}</textarea><button onclick="scripts.splice(${i},1);renderConfigEditors()" style="color:red;border:none;background:none;">Видалити</button></div>`;
         });
     }
+
+    function saveAllConfig() { db.ref('config').set({faq: faqs, scripts: scripts}).then(()=>alert('Всі налаштування збережено! ❄️')); }
+    function addFAQRow() { faqs.push({q:'Нове питання', a:'Відповідь'}); renderConfigEditors(); }
+    function addScriptRow() { scripts.push({title:'Кнопка', text:'Текст'}); renderConfigEditors(); }
 
     function renderMgrList() {
-        const list = document.getElementById('mgr-list'); list.innerHTML = '';
+        const l = document.getElementById('mgr-list'); l.innerHTML = '';
         Object.keys(managers).forEach(id => {
-            list.innerHTML += `<div class="manager-row" style="background:#f1f3f4; padding:10px; border-radius:10px; margin-bottom:5px; display:flex; justify-content:space-between;">
-                <span><b>${managers[id].name}</b> (TG: ${managers[id].tgId})</span>
-                <button onclick="db.ref('managers/${id}').remove()" style="color:red; border:none; background:none;">✕</button>
+            l.innerHTML += `<div style="background:#f1f3f4; padding:12px; border-radius:15px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                <span><b>${managers[id].name}</b><br><small>TG: ${managers[id].tgId}</small></span>
+                <button onclick="db.ref('managers/${id}').remove()" style="color:red; border:none; background:none; cursor:pointer; font-size:18px;">✕</button>
             </div>`;
         });
     }
 
-    function addFAQRow() { faqs.push({q:'', a:''}); renderCfgEditors(); }
-    function addScriptRow() { scripts.push({title:'', text:''}); renderCfgEditors(); }
-    function saveCfg(type) { db.ref('config/'+type).set(type==='faq'?faqs:scripts).then(()=>alert('Збережено!')); }
     function addMgr() {
-        const n=document.getElementById('n-m-name').value, l=document.getElementById('n-m-log').value, 
-              p=document.getElementById('n-m-pas').value, t=document.getElementById('n-m-tg').value;
+        const n=document.getElementById('n-m-name').value, l=document.getElementById('n-m-log').value, p=document.getElementById('n-m-pas').value, t=document.getElementById('n-m-tg').value;
         if(n && l && p) db.ref('managers').push({name:n, login:l, pass:p, tgId:t});
     }
 
@@ -359,18 +337,19 @@
         document.querySelectorAll('.view-tab').forEach(v=>v.style.display='none');
         document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
         document.getElementById('view-'+t).style.display='flex'; el.classList.add('active');
-        if(t==='support') document.getElementById('side-panel').style.display='flex';
+        if(t==='support') toggleSidebar(true);
     }
 
     function setMode(m) { mode = m; loadList(); }
     function archiveChat() {
-        if(!curId || !confirm('Архівувати?')) return;
+        if(!curId || !confirm('Архівувати діалог?')) return;
         db.ref('support/'+curId).once('value', snap => {
             db.ref('archive/'+curId).set(snap.val());
             db.ref('closed_chats/'+curId).set({lastMsg: "Закрито", ts: Date.now()});
             db.ref('support/'+curId).remove();
             db.ref('active_chats/'+curId).remove();
             curId = null; document.getElementById('support-msgs').innerHTML = '';
+            toggleSidebar(true);
         });
     }
 </script>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Latiao CRM PRO | Multi-Manager System</title>
+    <title>Latiao CRM PRO | Roles & Control</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -53,6 +53,7 @@
         .input-std { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; font-size: 14px; margin-bottom: 10px; }
         .btn-black { background: #000; color: #fff; border: none; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; width: 100%; }
         .manager-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #f8f9fa; border-radius: 10px; margin-bottom: 5px; font-size: 13px; }
+        .hidden-role { display: none !important; }
     </style>
 </head>
 <body>
@@ -64,7 +65,7 @@
             <input type="text" id="auth-login" class="auth-input" placeholder="Логін">
             <input type="password" id="auth-pass" class="auth-input" placeholder="Пароль">
             <button class="auth-btn" onclick="tryLogin()">Увійти</button>
-            <p id="auth-error" style="color: red; font-size: 12px; margin-top: 10px; display: none;">Невірний логін або пароль</p>
+            <p id="auth-error" style="color: red; font-size: 12px; margin-top: 10px; display: none;">Помилка входу</p>
         </div>
     </div>
 
@@ -84,14 +85,14 @@
                     <button class="auth-btn" style="padding:8px; font-size:10px; background:#666;" onclick="setMode('archived')">АРХІВ <b id="b-arc">0</b></button>
                 </div>
                 <div id="chat-list" style="flex:1; overflow-y:auto; padding:10px;"></div>
-                <button onclick="logout()" style="padding:10px; background:none; border:none; color:red; font-size:11px; cursor:pointer;">Вийти з акаунту</button>
+                <button onclick="logout()" style="padding:15px; background:none; border:none; color:red; font-size:12px; cursor:pointer; font-weight:bold;">🚪 Вийти з системи</button>
             </aside>
 
             <main class="viewport view-tab active" id="view-support">
                 <div class="top-nav">
                     <button class="auth-btn" style="width:35px; height:35px; padding:0;" onclick="document.getElementById('side-panel').classList.remove('hidden')">‹</button>
                     <b id="active-user" style="font-size:14px">Оберіть чат</b>
-                    <button style="margin-left:auto; border:none; background:none; color:var(--accent); font-weight:800;" onclick="archiveChat()">АРХІВУВАТИ</button>
+                    <button style="margin-left:auto; border:none; background:none; color:var(--accent); font-weight:800;" onclick="archiveChat()">ЗАКРИТИ</button>
                 </div>
                 <div class="msg-area" id="support-msgs"></div>
                 <div class="scripts-bar" id="support-scripts"></div>
@@ -103,7 +104,7 @@
 
             <main class="viewport view-tab" id="view-community" style="display:none; flex-direction:row; flex-wrap:wrap;">
                 <div style="flex:2; min-width:320px; display:flex; flex-direction:column; border-right:1px solid var(--border); height:100%;">
-                    <div class="top-nav"><b>Чат Спільноти</b></div>
+                    <div class="top-nav"><b>Чат Клубу</b></div>
                     <div class="msg-area" id="comm-msgs"></div>
                     <div class="scripts-bar" id="comm-scripts"></div>
                     <form class="footer" onsubmit="sendC(event)">
@@ -111,7 +112,7 @@
                         <button type="submit" style="background:#000; color:#fff; border:none; width:44px; height:44px; border-radius:50%;">➤</button>
                     </form>
                 </div>
-                <div class="viewport" style="flex:1; min-width:300px; padding:15px;">
+                <div class="viewport" style="flex:1; min-width:300px; padding:15px; overflow-y:auto;">
                     <h4 style="font-size:11px; color:#888; margin-bottom:10px">ОНЛАЙН</h4>
                     <div id="u-cards"></div>
                 </div>
@@ -119,19 +120,21 @@
 
             <main class="viewport view-tab" id="view-settings" style="display:none;">
                 <div class="settings-area">
-                    <div class="set-card">
+                    <div class="set-card" id="admin-only-section">
                         <h4 style="margin-top:0">👥 Менеджери</h4>
                         <div id="managers-list"></div>
                         <hr style="margin:20px 0; border:none; border-top:1px solid #eee;">
-                        <input type="text" id="new-mgr-name" class="input-std" placeholder="Ім'я менеджера">
+                        <input type="text" id="new-mgr-name" class="input-std" placeholder="Ім'я">
                         <input type="text" id="new-mgr-login" class="input-std" placeholder="Логін">
                         <input type="text" id="new-mgr-pass" class="input-std" placeholder="Пароль">
-                        <button class="btn-black" onclick="addManager()">Створити менеджера</button>
+                        <button class="btn-black" onclick="addManager()">Створити доступ</button>
                     </div>
+
                     <div class="set-card">
                         <h4>📝 Швидкі відповіді</h4>
                         <div id="script-editor-list"></div>
-                        <button class="btn-black" onclick="addScript()">+ Додати скрипт</button>
+                        <button class="btn-black" onclick="addScript()">+ Додати новий скрипт</button>
+                        <button class="btn-black" style="background:var(--accent); margin-top:15px;" onclick="saveScriptsToDB()">💾 Зберегти всі скрипти</button>
                     </div>
                 </div>
             </main>
@@ -151,23 +154,24 @@
         const log = document.getElementById('auth-login').value;
         const pas = document.getElementById('auth-pass').value;
 
-        // Головний адмін за замовчуванням
         if(log === 'admin' && pas === 'latiao2024') {
-            loginSuccess({name: 'Адмін', role: 'owner'});
+            loginSuccess({name: 'Власник', role: 'owner'});
             return;
         }
 
-        // Перевірка інших менеджерів
         db.ref('managers').once('value', snap => {
             let found = false;
             snap.forEach(m => {
                 const d = m.val();
                 if(d.login === log && d.pass === pas) {
-                    loginSuccess(d);
+                    loginSuccess({name: d.name, role: 'manager'});
                     found = true;
                 }
             });
-            if(!found) document.getElementById('auth-error').style.display = 'block';
+            if(!found) {
+                document.getElementById('auth-error').style.display = 'block';
+                document.getElementById('auth-error').innerText = "Невірний логін або пароль";
+            }
         });
     }
 
@@ -179,27 +183,30 @@
         initCRM();
     }
 
-    function logout() {
-        localStorage.removeItem('crm_user');
-        location.reload();
-    }
+    function logout() { localStorage.removeItem('crm_user'); location.reload(); }
 
     function getGreeting() {
-        const hour = new Date().getHours();
-        if (hour >= 5 && hour < 12) return "Доброго ранку";
-        if (hour >= 12 && hour < 18) return "Доброго дня";
-        if (hour >= 18 && hour < 23) return "Доброго вечора";
+        const hr = new Date().getHours();
+        if (hr >= 5 && hr < 12) return "Доброго ранку";
+        if (hr >= 12 && hr < 18) return "Доброго дня";
+        if (hr >= 18 && hr < 23) return "Доброго вечора";
         return "Доброї ночі";
     }
 
     function initCRM() {
         document.getElementById('greeting-text').innerText = `${getGreeting()}, ${currentUser.name}!`;
+        
+        // Hide manager management if not owner
+        if(currentUser.role !== 'owner') {
+            document.getElementById('admin-only-section').classList.add('hidden-role');
+        }
+
         loadList();
-        loadScripts();
+        loadScriptsFromDB();
         loadManagers();
     }
 
-    // MANAGERS MGMT
+    // MANAGER LOGIC
     function loadManagers() {
         db.ref('managers').on('value', snap => {
             const list = document.getElementById('managers-list');
@@ -208,7 +215,7 @@
                 const d = m.val();
                 list.innerHTML += `<div class="manager-row">
                     <span><b>${d.name}</b> (${d.login})</span>
-                    <button onclick="db.ref('managers/${m.key}').remove()" style="color:red; border:none; background:none; cursor:pointer;">✕</button>
+                    <button onclick="deleteManager('${m.key}')" style="color:red; border:none; background:none; cursor:pointer; font-weight:bold;">✕</button>
                 </div>`;
             });
         });
@@ -220,12 +227,59 @@
         const pass = document.getElementById('new-mgr-pass').value;
         if(name && login && pass) {
             db.ref('managers').push({name, login, pass});
-            alert('Менеджера додано!');
-            document.querySelectorAll('#view-settings input').forEach(i => i.value = '');
+            alert('Менеджера створено!');
+            document.getElementById('new-mgr-name').value = '';
+            document.getElementById('new-mgr-login').value = '';
+            document.getElementById('new-mgr-pass').value = '';
         }
     }
 
-    // TAB NAV
+    function deleteManager(key) { if(confirm('Видалити доступ?')) db.ref('managers/' + key).remove(); }
+
+    // SCRIPT LOGIC
+    function loadScriptsFromDB() {
+        db.ref('config/scripts').on('value', snap => {
+            currentScripts = snap.val() || [];
+            renderScriptsEditor();
+            renderScriptsToChat();
+        });
+    }
+
+    function renderScriptsEditor() {
+        const cont = document.getElementById('script-editor-list');
+        cont.innerHTML = '';
+        currentScripts.forEach((s, i) => {
+            cont.innerHTML += `<div style="border:1px solid #eee; padding:15px; border-radius:15px; margin-bottom:10px">
+                <input class="input-std" value="${s.title}" onchange="currentScripts[${i}].title=this.value" placeholder="Назва кнопки">
+                <textarea class="input-std" style="height:60px" onchange="currentScripts[${i}].text=this.value" placeholder="Текст відповіді">${s.text}</textarea>
+                <button onclick="removeScript(${i})" style="color:red; background:none; border:none; font-size:11px; cursor:pointer;">Видалити скрипт</button>
+            </div>`;
+        });
+    }
+
+    function renderScriptsToChat() {
+        const conts = [document.getElementById('support-scripts'), document.getElementById('comm-scripts')];
+        conts.forEach(c => {
+            c.innerHTML = '';
+            currentScripts.forEach(s => {
+                const btn = document.createElement('button');
+                btn.className = 'script-btn';
+                btn.innerText = s.title;
+                btn.onclick = () => {
+                    const inp = c.nextElementSibling.querySelector('input');
+                    inp.value = s.text;
+                    inp.focus();
+                };
+                c.appendChild(btn);
+            });
+        });
+    }
+
+    function addScript() { currentScripts.push({title: 'Новий', text: ''}); renderScriptsEditor(); }
+    function removeScript(i) { currentScripts.splice(i, 1); renderScriptsEditor(); }
+    function saveScriptsToDB() { db.ref('config/scripts').set(currentScripts).then(() => alert('Скрипти збережено!')); }
+
+    // CORE LOGIC
     function nav(tab, el) {
         document.querySelectorAll('.view-tab').forEach(v => v.style.display = 'none');
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -234,31 +288,8 @@
         document.getElementById('side-panel').style.display = (tab === 'support' ? 'flex' : 'none');
     }
 
-    // SCRIPTS
-    function loadScripts() {
-        db.ref('config/scripts').on('value', snap => {
-            const s = snap.val() || [];
-            const conts = [document.getElementById('support-scripts'), document.getElementById('comm-scripts')];
-            conts.forEach(c => {
-                c.innerHTML = '';
-                s.forEach(item => {
-                    const btn = document.createElement('button');
-                    btn.className = 'script-btn';
-                    btn.innerText = item.title;
-                    btn.onclick = () => {
-                        const inp = c.nextElementSibling.querySelector('input');
-                        inp.value = item.text;
-                        inp.focus();
-                    };
-                    c.appendChild(btn);
-                });
-            });
-        });
-    }
-
-    // CORE CRM FUNCTIONS (НЕЗМІННІ)
     function setMode(m) { mode = m; loadList(); }
-    
+
     db.ref('active_chats').on('value', snap => {
         document.getElementById('b-total').innerText = snap.numChildren();
         document.getElementById('b-act').innerText = snap.numChildren();
@@ -281,7 +312,8 @@
 
     function selectS(id) {
         document.getElementById('active-user').innerText = "Чат: " + id.substring(1,9);
-        db.ref('support/' + id).on('value', snap => {
+        const path = mode === 'active' ? 'support/' : 'archive/';
+        db.ref(path + id).on('value', snap => {
             const area = document.getElementById('support-msgs'); area.innerHTML = '';
             snap.forEach(m => {
                 const d = m.val();
@@ -291,10 +323,48 @@
         });
     }
 
+    function archiveChat() {
+        if(!curId) return;
+        if(confirm('Закрити діалог та перенести в архів?')) {
+            db.ref('support/' + curId).once('value', snap => {
+                db.ref('archive/' + curId).set(snap.val());
+                db.ref('closed_chats/' + curId).set({ts: Date.now(), lastMsg: "Діалог завершено"});
+                db.ref('support/' + curId).remove();
+                db.ref('active_chats/' + curId).remove();
+                curId = null; 
+                document.getElementById('support-msgs').innerHTML = '';
+                document.getElementById('side-panel').classList.remove('hidden');
+            });
+        }
+    }
+
     function sendS(e) { e.preventDefault(); const i = document.getElementById('s-input'); if(!curId || !i.value) return; db.ref('support/'+curId).push({text: i.value, type: 'admin', ts: Date.now()}); db.ref('active_chats/'+curId).update({lastMsg: "Ви: "+i.value, ts: Date.now()}); i.value = ''; }
     function sendC(e) { e.preventDefault(); const i = document.getElementById('c-input'); if(i.value) db.ref('messages').push({uid:'SHOP', name:'ADMIN', text:i.value, ts:Date.now()}); i.value=''; }
 
-    // AUTO-LOGIN ON REFRESH
+    db.ref('presence').on('value', snap => {
+        const cont = document.getElementById('u-cards'); cont.innerHTML = '';
+        snap.forEach(c => {
+            const u = c.val();
+            cont.innerHTML += `<div class="u-card" style="padding:10px; border:1px solid #eee; margin-bottom:5px; border-radius:10px;">
+                <b>${u.name || 'Гість'}</b><br>
+                <small style="color:#888">${u.phone || 'Без номера'}</small>
+            </div>`;
+        });
+    });
+
+    db.ref('messages').limitToLast(20).on('value', snap => {
+        const area = document.getElementById('comm-msgs'); area.innerHTML = '';
+        snap.forEach(c => {
+            const m = c.val();
+            const div = document.createElement('div');
+            div.className = `bubble ${m.uid==='SHOP'?'out':'in'}`;
+            div.style.alignSelf = m.uid==='SHOP'?'flex-end':'flex-start';
+            div.innerHTML = `<small style="display:block;font-size:9px;opacity:0.5">${m.name}</small>${m.text}`;
+            area.appendChild(div);
+        });
+        area.scrollTop = area.scrollHeight;
+    });
+
     if(currentUser) loginSuccess(currentUser);
 </script>
 </body>

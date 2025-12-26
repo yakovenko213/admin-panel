@@ -3,275 +3,262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Latiao CRM | Management Panel</title>
+    <title>Latiao CRM PRO | Multi-Chat Control</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #e62117;
-            --primary-light: #fff1f0;
-            --bg: #f8fafc;
-            --sidebar: #ffffff;
-            --text-main: #0f172a;
-            --text-sub: #64748b;
-            --border: #e2e8f0;
-            --radius: 16px;
-        }
-
+        :root { --primary: #e62117; --primary-light: #fff1f0; --bg: #f8fafc; --sidebar: #ffffff; --text-main: #0f172a; --text-sub: #64748b; --border: #e2e8f0; --radius: 16px; --blue: #007aff; --gold: #ffb900; }
         * { box-sizing: border-box; }
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            margin: 0; 
-            background: var(--bg); 
-            color: var(--text-main);
-            overflow: hidden;
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--bg); color: var(--text-main); overflow: hidden; height: 100vh; }
 
-        /* Сторінка авторизації */
-        #auth-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            display: flex; align-items: center; justify-content: center; z-index: 10000;
-        }
-        .auth-card {
-            background: #fff; padding: 40px; border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.05); width: 100%; max-width: 400px;
-            text-align: center; border: 1px solid #fff;
-        }
-        .auth-card h2 { margin-bottom: 30px; font-weight: 800; color: var(--primary); }
-        .auth-input {
-            width: 100%; padding: 14px 20px; border-radius: 12px;
-            border: 1px solid var(--border); margin-bottom: 15px; outline: none;
-            transition: 0.3s; font-size: 16px;
-        }
-        .auth-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-light); }
-        .auth-btn {
-            width: 100%; padding: 14px; border-radius: 12px; border: none;
-            background: var(--primary); color: #fff; font-weight: 700;
-            cursor: pointer; transition: 0.3s; font-size: 16px;
-        }
-        .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(230,33,23,0.2); }
+        /* Auth Screen */
+        #auth-screen { position: fixed; inset: 0; background: #f8fafc; display: flex; align-items: center; justify-content: center; z-index: 10000; }
+        .auth-card { background: #fff; padding: 40px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.05); width: 100%; max-width: 400px; text-align: center; }
+        .auth-input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; outline: none; }
+        .auth-btn { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--primary); color: #fff; font-weight: 700; cursor: pointer; }
 
-        /* CRM Інтерфейс */
+        /* Layout */
         #crm-app { display: none; height: 100vh; flex-direction: row; }
-
-        .sidebar {
-            width: 320px; background: var(--sidebar); border-right: 1px solid var(--border);
-            display: flex; flex-direction: column; z-index: 100;
-        }
-        .sidebar-header { padding: 30px 20px; border-bottom: 1px solid var(--border); }
-        .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; color: var(--primary); }
+        .sidebar { width: 300px; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 25px 20px; border-bottom: 1px solid var(--border); font-weight: 800; color: var(--primary); font-size: 18px; }
         
-        .chat-filters { display: flex; padding: 15px 20px; gap: 10px; border-bottom: 1px solid var(--border); }
-        .filter-btn {
-            flex: 1; padding: 10px; border-radius: 10px; border: none;
-            background: #f1f5f9; color: var(--text-sub); font-weight: 700; font-size: 12px;
-            cursor: pointer; transition: 0.2s;
-        }
-        .filter-btn.active { background: var(--primary-light); color: var(--primary); }
+        .nav-menu { padding: 10px; flex: 1; overflow-y: auto; }
+        .nav-link { padding: 12px; border-radius: 12px; cursor: pointer; font-weight: 600; color: var(--text-sub); display: flex; align-items: center; gap: 10px; transition: 0.2s; margin-bottom: 4px; }
+        .nav-link:hover { background: #f1f5f9; }
+        .nav-link.active { background: var(--primary-light); color: var(--primary); }
 
-        .chat-list { flex: 1; overflow-y: auto; padding: 10px; }
-        .chat-card {
-            padding: 16px; border-radius: var(--radius); cursor: pointer;
-            transition: 0.2s; margin-bottom: 8px; border: 1px solid transparent;
-        }
-        .chat-card:hover { background: #f1f5f9; }
-        .chat-card.active { background: var(--primary-light); border-color: #fee2e2; }
-        .chat-card strong { display: block; font-size: 14px; margin-bottom: 4px; }
-        .chat-card small { color: var(--text-sub); font-size: 12px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* Main Content */
+        .main { flex: 1; display: flex; flex-direction: column; background: #fff; position: relative; }
+        .tab-content { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+        .tab-content.active { display: flex; }
 
-        .main { flex: 1; display: flex; flex-direction: column; background: #fff; }
-        .main-header { padding: 20px 30px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        /* Messaging Area */
+        .chat-header { padding: 15px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .msg-area { flex: 1; padding: 20px; overflow-y: auto; background: #f8fafc; display: flex; flex-direction: column; gap: 10px; }
+        .bubble { padding: 10px 16px; border-radius: 18px; max-width: 75%; font-size: 14px; line-height: 1.4; }
+        .bubble.user { align-self: flex-start; background: #fff; border: 1px solid var(--border); }
+        .bubble.admin { align-self: flex-end; background: var(--primary); color: #fff; }
+        .bubble.shop { align-self: center; background: var(--gold); color: #000; font-weight: bold; border-radius: 10px; }
         
-        .msg-area { 
-            flex: 1; padding: 30px; overflow-y: auto; background: #f8fafc;
-            display: flex; flex-direction: column; gap: 12px;
-        }
-        .bubble {
-            padding: 12px 18px; border-radius: 18px; max-width: 70%; font-size: 14px;
-            line-height: 1.5; position: relative;
-        }
-        .bubble.user { align-self: flex-start; background: #fff; border: 1px solid var(--border); color: var(--text-main); }
-        .bubble.admin { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 4px; }
-
-        .input-area { padding: 20px 30px; border-top: 1px solid var(--border); display: flex; gap: 15px; }
-        .input-area input {
-            flex: 1; padding: 14px 24px; border-radius: 30px;
-            border: 1px solid var(--border); outline: none; background: #f1f5f9;
-        }
-        .send-btn {
-            width: 50px; height: 50px; border-radius: 50%; border: none;
-            background: var(--primary); color: #fff; cursor: pointer; font-size: 18px;
-        }
-
-        .tab-btn {
-            padding: 10px 20px; border: none; background: none; font-weight: 700;
-            color: var(--text-sub); cursor: pointer; font-size: 14px;
-        }
-        .tab-btn.active { color: var(--primary); }
-
-        @media (max-width: 768px) {
-            .sidebar { width: 80px; }
-            .logo span, .chat-card strong, .chat-card small, .filter-btn span { display: none; }
-            .chat-card { text-align: center; }
-        }
+        /* Community Tab Specifics */
+        .community-container { display: flex; height: 100%; }
+        .comm-chat { flex: 1; display: flex; flex-direction: column; border-right: 1px solid var(--border); }
+        .comm-tools { width: 300px; background: #fafbfc; padding: 20px; overflow-y: auto; }
+        .tool-box { background: #fff; border: 1px solid var(--border); padding: 15px; border-radius: 15px; margin-bottom: 15px; }
+        .tool-box h4 { margin: 0 0 10px 0; font-size: 13px; text-transform: uppercase; color: var(--text-sub); }
+        .comm-user-item { padding: 8px 0; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+        
+        /* Inputs */
+        .input-form { padding: 15px 25px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+        .input-form input { flex: 1; padding: 12px 20px; border-radius: 25px; border: 1px solid var(--border); outline: none; background: #f1f5f9; }
+        .btn-sm { padding: 4px 8px; border-radius: 6px; border: none; font-size: 10px; font-weight: 800; cursor: pointer; color: #fff; }
+        .btn-primary { background: var(--primary); color: #fff; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: 700; }
     </style>
 </head>
 <body>
 
     <div id="auth-screen">
         <div class="auth-card">
-            <div class="logo" style="justify-content: center; margin-bottom: 20px;">🚀 Latiao CRM</div>
-            <h2>Вхід в систему</h2>
+            <h2>Latiao CRM Вхід</h2>
             <input type="text" id="login-field" class="auth-input" placeholder="Логін">
             <input type="password" id="pass-field" class="auth-input" placeholder="Пароль">
             <button class="auth-btn" onclick="tryLogin()">Увійти</button>
-            <p id="error-msg" style="color: var(--primary); font-size: 14px; margin-top: 15px; display: none;">Невірний логін або пароль</p>
         </div>
     </div>
 
     <div id="crm-app">
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">🚀 <span>Latiao CRM</span></div>
-            </div>
-            <div class="chat-filters">
-                <button class="filter-btn active" onclick="toggleList('active', this)"><span>Активні</span></button>
-                <button class="filter-btn" onclick="toggleList('closed', this)"><span>Архів</span></button>
-            </div>
-            <div id="chat-list" class="chat-list"></div>
-            <div style="padding: 20px; border-top: 1px solid var(--border);">
-                <button class="nav-link" onclick="logout()" style="color: var(--text-sub); border:none; background:none; cursor:pointer; font-weight:600;">Выйти</button>
-            </div>
+            <div class="sidebar-header">LATIAO CRM PRO</div>
+            <nav class="nav-menu">
+                <div class="nav-link active" onclick="switchTab('support', this)">💬 Підтримка (1:1)</div>
+                <div class="nav-link" onclick="switchTab('community', this)">🌶️ Спільнота (Загальний)</div>
+                <div class="nav-link" onclick="switchTab('stats', this)">📊 Статистика</div>
+            </nav>
+            <div id="support-chat-list" style="padding: 10px; border-top: 1px solid #eee; overflow-y:auto; flex:1;"></div>
         </aside>
 
         <main class="main">
-            <div class="main-header">
-                <div id="current-chat-title" style="font-weight: 800;">Оберіть діалог</div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-action" onclick="requestPhone()" style="background: none; border: 1px solid var(--border); padding: 8px 15px; border-radius: 8px; cursor: pointer;">📞 Телефон</button>
-                    <button class="btn-action" onclick="archiveChat()" style="background: var(--primary-light); border: none; color: var(--primary); padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 700;">Архівувати</button>
+            <section id="tab-support" class="tab-content active">
+                <div class="chat-header">
+                    <b id="support-title">Оберіть клієнта</b>
+                    <button class="btn-sm" style="background:var(--primary)" onclick="archiveSupport()">Архівувати</button>
                 </div>
-            </div>
+                <div id="support-msgs" class="msg-area"></div>
+                <form class="input-form" onsubmit="sendSupportMsg(event)">
+                    <input type="text" id="support-input" placeholder="Напишіть клієнту...">
+                    <button type="submit" class="btn-primary">➤</button>
+                </form>
+            </section>
 
-            <div id="msg-area" class="msg-area"></div>
-
-            <form class="input-area" onsubmit="sendReply(event)">
-                <input type="text" id="admin-input" placeholder="Напишіть повідомлення..." autocomplete="off">
-                <button type="submit" class="send-btn">➤</button>
-            </form>
+            <section id="tab-community" class="tab-content">
+                <div class="community-container">
+                    <div class="comm-chat">
+                        <div class="chat-header"><b>Моніторинг Спільноти</b></div>
+                        <div id="comm-msgs" class="msg-area"></div>
+                        <form class="input-form" onsubmit="sendCommMsg(event)">
+                            <input type="text" id="comm-input" placeholder="Повідомлення від SHOP...">
+                            <button type="submit" class="btn-primary">➤</button>
+                        </form>
+                    </div>
+                    <div class="comm-tools">
+                        <div class="tool-box">
+                            <h4>📢 Реклама (SHOP)</h4>
+                            <input type="text" id="ad-img" placeholder="URL картинки" style="width:100%; margin-bottom:5px; font-size:11px; padding:5px;">
+                            <textarea id="ad-text" placeholder="Текст реклами..." style="width:100%; height:60px; font-size:11px; padding:5px; border-radius:8px; border:1px solid #ddd;"></textarea>
+                            <button class="btn-primary" style="width:100%; margin-top:5px; font-size:11px;" onclick="postAd()">Запустити</button>
+                        </div>
+                        <div class="tool-box">
+                            <h4>📊 Опитування</h4>
+                            <input type="text" id="poll-q" placeholder="Питання" style="width:100%; margin-bottom:5px; font-size:11px; padding:5px;">
+                            <button class="btn-primary" style="width:100%; font-size:11px;" onclick="postPoll()">Створити</button>
+                        </div>
+                        <div class="tool-box">
+                            <h4>👥 Юзери онлайн</h4>
+                            <div id="comm-user-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
-    <script>
-        // --- Налаштування авторизації ---
-        const ADMIN_USER = "admin";
-        const ADMIN_PASS = "latiao2025";
-
-        function tryLogin() {
-            const l = document.getElementById('login-field').value;
-            const p = document.getElementById('pass-field').value;
-            if(l === ADMIN_USER && p === ADMIN_PASS) {
-                document.getElementById('auth-screen').style.display = 'none';
-                document.getElementById('crm-app').style.display = 'flex';
-                localStorage.setItem('crm_logged', 'true');
-                initFirebase();
-            } else {
-                document.getElementById('error-msg').style.display = 'block';
-            }
-        }
-
-        if(localStorage.getItem('crm_logged') === 'true') {
+<script>
+    // Config & Login
+    const config = { databaseURL: "https://latiao-chat-default-rtdb.firebaseio.com" };
+    firebase.initializeApp(config);
+    const db = firebase.database();
+    
+    function tryLogin() {
+        const l = document.getElementById('login-field').value;
+        const p = document.getElementById('pass-field').value;
+        if(l === 'admin' && p === 'latiao2025') {
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('crm-app').style.display = 'flex';
+            initCRM();
         }
+    }
 
-        function logout() {
-            localStorage.removeItem('crm_logged');
-            location.reload();
+    function switchTab(tab, el) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        document.getElementById('tab-'+tab).classList.add('active');
+        el.classList.add('active');
+    }
+
+    let currentSupportId = null;
+
+    function initCRM() {
+        // 1. SUPPORT CHATS LIST
+        db.ref('active_chats').on('value', snap => {
+            const list = document.getElementById('support-chat-list');
+            list.innerHTML = '<small style="color:#999">АКТИВНІ ДІАЛОГИ</small>';
+            snap.forEach(child => {
+                const div = document.createElement('div');
+                div.className = 'nav-link';
+                div.style.fontSize = '12px';
+                div.innerHTML = `👤 ${child.key.substring(0,8)}...`;
+                div.onclick = () => selectSupportChat(child.key);
+                list.appendChild(div);
+            });
+        });
+
+        // 2. COMMUNITY MONITORING
+        db.ref('messages').limitToLast(30).on('value', snap => {
+            const area = document.getElementById('comm-msgs');
+            area.innerHTML = '';
+            snap.forEach(child => {
+                const m = child.val();
+                const div = document.createElement('div');
+                div.className = m.uid === 'SHOP' ? 'bubble shop' : 'bubble user';
+                div.innerHTML = `<small style="display:block; font-size:9px; opacity:0.6">${m.name || 'Юзер'}</small>${m.text}`;
+                area.appendChild(div);
+            });
+            area.scrollTop = area.scrollHeight;
+        });
+
+        // 3. COMMUNITY USERS
+        db.ref('presence').on('value', snap => {
+            const list = document.getElementById('comm-user-list');
+            list.innerHTML = '';
+            snap.forEach(child => {
+                const u = child.val();
+                const div = document.createElement('div');
+                div.className = 'comm-user-item';
+                div.innerHTML = `<span>${u.name || 'Гість'}</span>
+                    <div style="display:flex; gap:2px">
+                        <button class="btn-sm" style="background:var(--blue)" onclick="sendPrivate('${child.key}')">✉️</button>
+                        <button class="btn-sm" style="background:var(--gold)" onclick="reqPhone('${child.key}')">📱</button>
+                        <button class="btn-sm" style="background:var(--primary)" onclick="banUser('${child.key}')">🚫</button>
+                    </div>`;
+                list.appendChild(div);
+            });
+        });
+    }
+
+    // SUPPORT ACTIONS
+    function selectSupportChat(id) {
+        currentSupportId = id;
+        document.getElementById('support-title').innerText = "Клієнт: " + id;
+        db.ref('support/' + id).on('value', snap => {
+            const area = document.getElementById('support-msgs');
+            area.innerHTML = '';
+            snap.forEach(child => {
+                const m = child.val();
+                const div = document.createElement('div');
+                div.className = 'bubble ' + m.type;
+                div.innerText = m.text;
+                area.appendChild(div);
+            });
+            area.scrollTop = area.scrollHeight;
+        });
+    }
+
+    function sendSupportMsg(e) {
+        e.preventDefault();
+        const input = document.getElementById('support-input');
+        if(!currentSupportId || !input.value) return;
+        db.ref('support/' + currentSupportId).push({ text: input.value, type: 'admin', ts: Date.now() });
+        input.value = '';
+    }
+
+    // COMMUNITY ACTIONS
+    function sendCommMsg(e) {
+        e.preventDefault();
+        const input = document.getElementById('comm-input');
+        if(!input.value) return;
+        db.ref('messages').push({ uid: 'SHOP', name: 'SHOP ADMIN', text: input.value, ts: Date.now() });
+        input.value = '';
+    }
+
+    function postAd() {
+        const text = document.getElementById('ad-text').value;
+        const img = document.getElementById('ad-img').value;
+        if(text) db.ref('messages').push({ uid: 'SHOP', name: '🛍️ Latiao PROMO', text: text, img: img, ts: Date.now() });
+    }
+
+    function postPoll() {
+        const q = document.getElementById('poll-q').value;
+        if(q) db.ref('polls').push({ question: q, o1: 'ТАК 🔥', o2: 'НІ 🌶️', v1: 0, v2: 0, ts: Date.now() });
+    }
+
+    // USER MGMT
+    window.sendPrivate = (uid) => {
+        const msg = prompt("Приватне повідомлення:");
+        if(msg) db.ref('private_messages/' + uid).push({ text: msg, ts: Date.now() });
+    }
+
+    window.reqPhone = (uid) => {
+        if(confirm("Запросити номер телефону?")) {
+            db.ref('presence/' + uid).update({ requirePhone: true, phoneProvided: false });
         }
+    }
 
-        // --- Firebase Логіка ---
-        const firebaseConfig = { databaseURL: "https://latiao-chat-default-rtdb.firebaseio.com" };
-        
-        function initFirebase() {
-            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-            const db = firebase.database();
-            let currentId = null;
-            let currentMode = 'active';
-
-            window.toggleList = function(mode, btn) {
-                currentMode = mode;
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                loadChats();
-            }
-
-            function loadChats() {
-                const path = currentMode === 'active' ? 'active_chats' : 'closed_chats';
-                db.ref(path).on('value', snap => {
-                    const list = document.getElementById('chat-list');
-                    list.innerHTML = '';
-                    snap.forEach(child => {
-                        const div = document.createElement('div');
-                        div.className = `chat-card ${currentId === child.key ? 'active' : ''}`;
-                        div.innerHTML = `<strong>ID: ${child.key.substring(1, 10)}</strong><small>${child.val().lastMsg || '...'}</small>`;
-                        div.onclick = () => selectChat(child.key);
-                        list.appendChild(div);
-                    });
-                });
-            }
-
-            function selectChat(id) {
-                currentId = id;
-                document.getElementById('current-chat-title').innerText = "Діалог: " + id.substring(1, 10);
-                const path = currentMode === 'active' ? 'support/' : 'archive/';
-                db.ref(path + id).on('value', snap => {
-                    const area = document.getElementById('msg-area');
-                    area.innerHTML = '';
-                    snap.forEach(m => {
-                        const data = m.val();
-                        const div = document.createElement('div');
-                        div.className = 'bubble ' + data.type;
-                        div.innerText = data.text;
-                        area.appendChild(div);
-                    });
-                    area.scrollTop = area.scrollHeight;
-                });
-                loadChats();
-            }
-
-            window.sendReply = function(e) {
-                e.preventDefault();
-                const input = document.getElementById('admin-input');
-                if(!currentId || !input.value.trim()) return;
-                db.ref('support/' + currentId).push({ text: input.value, type: 'admin', ts: Date.now() });
-                db.ref('active_chats/' + currentId).update({ lastMsg: "Ви: " + input.value, ts: Date.now() });
-                input.value = '';
-            }
-
-            window.archiveChat = function() {
-                if(!currentId) return;
-                db.ref('support/' + currentId).once('value', snap => {
-                    db.ref('archive/' + currentId).set(snap.val());
-                    db.ref('closed_chats/' + currentId).set({ ts: Date.now(), lastMsg: "Архівовано" });
-                    db.ref('support/' + currentId).remove();
-                    db.ref('active_chats/' + currentId).remove();
-                    currentId = null;
-                    document.getElementById('msg-area').innerHTML = '';
-                    loadChats();
-                });
-            }
-
-            window.requestPhone = function() {
-                if(currentId) db.ref('support/' + currentId).push({ text: "Будь ласка, залиште ваш номер телефону для зв'язку:", type: 'admin', ts: Date.now() });
-            }
-
-            loadChats();
+    window.banUser = (uid) => {
+        if(confirm("Забанити цього користувача?")) {
+            db.ref('banned_users/' + uid).set({ ts: Date.now() });
         }
-
-        if(localStorage.getItem('crm_logged') === 'true') initFirebase();
-    </script>
+    }
+</script>
 </body>
 </html>

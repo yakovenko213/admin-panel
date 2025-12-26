@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Latiao CRM PRO | FAQ Editor</title>
+    <title>Latiao CRM PRO | Scripts & FAQ Editor</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -24,31 +24,17 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--chrome-bg); display: flex; flex-direction: column; }
 
         /* TABS */
-        .chrome-header { 
-            display: flex; align-items: flex-end; padding: 8px 8px 0; gap: 4px; 
-            background: var(--chrome-bg); border-bottom: 1px solid #c1c3c8; flex-shrink: 0;
-        }
-        .tab {
-            position: relative; padding: 10px 15px; min-width: 60px; height: 38px;
-            background: transparent; border-radius: 12px 12px 0 0;
-            cursor: pointer; font-size: 13px; font-weight: 600; color: #5f6368;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
+        .chrome-header { display: flex; align-items: flex-end; padding: 8px 8px 0; gap: 4px; background: var(--chrome-bg); border-bottom: 1px solid #c1c3c8; flex-shrink: 0; }
+        .tab { position: relative; padding: 10px 15px; min-width: 60px; height: 38px; background: transparent; border-radius: 12px 12px 0 0; cursor: pointer; font-size: 13px; font-weight: 600; color: #5f6368; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .tab span { display: none; }
         .tab.active { background: var(--chrome-tab); color: var(--accent); }
         .tab.active::before { content: ''; position: absolute; bottom: 0; left: -15px; width: 15px; height: 15px; border-bottom-right-radius: 10px; box-shadow: 5px 0 0 0 var(--chrome-tab); }
         .tab.active::after { content: ''; position: absolute; bottom: 0; right: -15px; width: 15px; height: 15px; border-bottom-left-radius: 10px; box-shadow: -5px 0 0 0 var(--chrome-tab); }
-        
         @media (min-width: 768px) { .tab { min-width: 160px; justify-content: flex-start; } .tab span { display: inline; } }
 
         /* LAYOUT */
         .app-shell { flex: 1; display: flex; background: #fff; overflow: hidden; position: relative; }
-
-        .sidebar { 
-            width: 100%; height: 100%; background: var(--sidebar-bg); border-right: 1px solid var(--border); 
-            display: flex; flex-direction: column; position: absolute; z-index: 100; 
-            transition: transform 0.3s ease; 
-        }
+        .sidebar { width: 100%; height: 100%; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: absolute; z-index: 100; transition: transform 0.3s ease; }
         .sidebar.hidden { transform: translateX(-100%); }
         @media (min-width: 992px) { .sidebar { position: relative; width: 340px; transform: none !important; } }
 
@@ -62,34 +48,29 @@
         .back-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         @media (min-width: 992px) { .back-btn { display: none; } }
 
+        /* SCRIPTS BAR (NEW) */
+        .scripts-bar { display: flex; gap: 8px; overflow-x: auto; padding: 8px 15px; background: #fff; border-top: 1px solid var(--border); scrollbar-width: none; }
+        .scripts-bar::-webkit-scrollbar { display: none; }
+        .script-btn { flex-shrink: 0; padding: 6px 12px; background: #f1f3f4; border: 1px solid #ddd; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+        .script-btn:hover { background: var(--accent-glow); color: var(--accent); }
+
         /* MESSAGES */
         .msg-area { flex: 1; padding: 15px; overflow-y: auto; background: #f4f6f8; display: flex; flex-direction: column; gap: 8px; }
         .bubble { padding: 12px 16px; border-radius: 18px; max-width: 85%; font-size: 14px; line-height: 1.4; position: relative; }
         .bubble.in { align-self: flex-start; background: #fff; border: 1px solid #eee; }
         .bubble.out { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
-        .msg-del { position: absolute; top: -8px; right: -8px; width: 22px; height: 22px; background: #000; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; opacity: 0; transition: 0.2s; }
-        .bubble:hover .msg-del { opacity: 1; }
-
-        /* USER CARDS */
-        .user-mgmt { padding: 15px; overflow-y: auto; background: #fdfdfd; }
-        .u-card { background: #fff; border: 1px solid var(--border); border-radius: 20px; padding: 15px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
-        .u-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
-        .u-avatar { width: 44px; height: 44px; border-radius: 14px; background: var(--accent-glow); color: var(--accent); font-weight: 800; display: flex; align-items: center; justify-content: center; position: relative; }
-        .u-dot { position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; }
-        .u-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-        .u-btn { border: none; padding: 10px; border-radius: 10px; font-size: 16px; cursor: pointer; background: #f1f3f4; display: flex; align-items: center; justify-content: center; }
 
         /* FOOTER */
         .footer { padding: 10px 15px; border-top: 1px solid var(--border); display: flex; gap: 10px; background: #fff; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
         .footer input { flex: 1; height: 44px; padding: 0 18px; border-radius: 22px; border: 1px solid #eee; background: #f5f5f5; font-size: 16px; }
 
-        /* SETTINGS - FAQ EDITOR */
-        .settings-area { padding: 20px; overflow-y: auto; height: 100%; background: #f9f9fb; }
-        .faq-editor-card { background: #fff; padding: 20px; border-radius: 20px; border: 1px solid var(--border); max-width: 600px; margin-bottom: 20px; }
-        .faq-item-row { display: flex; flex-direction: column; gap: 10px; padding: 15px; border: 1px solid #eee; border-radius: 15px; margin-bottom: 15px; background: #fff; }
-        .faq-input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ddd; font-size: 14px; }
-        .btn-add { background: #000; color: #fff; border: none; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
-        .btn-del-faq { background: #fee2e2; color: #ef4444; border: none; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; align-self: flex-end; }
+        /* SETTINGS */
+        .settings-area { padding: 20px; overflow-y: auto; background: #f9f9fb; height: 100%; }
+        .set-card { background: #fff; border-radius: 20px; border: 1px solid var(--border); padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .input-std { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd; font-size: 14px; margin-bottom: 10px; }
+        .btn-black { background: #000; color: #fff; border: none; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; width: 100%; }
+        .u-card { background: #fff; border: 1px solid var(--border); border-radius: 15px; padding: 12px; margin-bottom: 8px; }
+        .u-avatar { width: 40px; height: 40px; border-radius: 10px; background: var(--accent-glow); color: var(--accent); font-weight: 800; display: flex; align-items: center; justify-content: center; position: relative; }
     </style>
 </head>
 <body>
@@ -118,6 +99,9 @@
                 <button style="margin-left:auto; border:none; background:none; color:var(--accent); font-weight:800;" onclick="archiveChat()">ЗАКРИТИ</button>
             </div>
             <div class="msg-area" id="support-msgs"></div>
+            
+            <div class="scripts-bar" id="support-scripts"></div>
+
             <form class="footer" onsubmit="sendS(event)">
                 <input type="text" id="s-input" placeholder="Відповідь..." autocomplete="off">
                 <button type="submit" style="background:#000; color:#fff; border:none; width:44px; height:44px; border-radius:50%;">➤</button>
@@ -128,28 +112,33 @@
             <div style="flex:2; min-width:320px; display:flex; flex-direction:column; border-right:1px solid var(--border); height:100%;">
                 <div class="top-nav"><b>Чат Спільноти</b></div>
                 <div class="msg-area" id="comm-msgs"></div>
+                <div class="scripts-bar" id="comm-scripts"></div>
                 <form class="footer" onsubmit="sendC(event)">
                     <input type="text" id="c-input" placeholder="Від SHOP...">
                     <button type="submit" style="background:#000; color:#fff; border:none; width:44px; height:44px; border-radius:50%;">➤</button>
                 </form>
             </div>
-            <div class="user-mgmt" style="flex:1; min-width:320px; height:100%;">
-                <h4 style="font-size:11px; color:#888; margin:0 0 15px 0;">УПРАВЛІННЯ ЮЗЕРАМИ</h4>
-                <div id="u-cards"></div>
+            <div class="viewport" style="flex:1; min-width:320px; background:#fdfdfd; padding:15px; border-left:1px solid #eee">
+                <h4 style="font-size:11px; color:#888; margin:0 0 10px 0;">УЧАСНИКИ</h4>
+                <div id="u-cards" style="overflow-y:auto; flex:1"></div>
             </div>
         </main>
 
         <main class="viewport view-tab" id="view-settings" style="display:none;">
             <div class="settings-area">
-                <div class="faq-editor-card">
-                    <h3 style="margin-top:0">⚙️ Налаштування FAQ</h3>
-                    <p style="font-size: 13px; color: #666;">Тут ви можете змінити питання та відповіді, які клієнт бачить при відкритті чату.</p>
-                    
-                    <div id="faq-list-container">
-                        </div>
-                    
-                    <button class="btn-add" onclick="addFAQItem()">+ Додати нове питання</button>
-                    <button class="btn-add" style="background: var(--accent); margin-top: 20px;" onclick="saveFAQToFirebase()">💾 Зберегти зміни</button>
+                <div class="set-card">
+                    <h4 style="margin-top:0">⚙️ Налаштування FAQ (Для клієнта)</h4>
+                    <div id="faq-editor-list"></div>
+                    <button class="btn-black" onclick="addFAQ()">+ Додати FAQ</button>
+                    <button class="btn-black" style="background:var(--accent); margin-top:10px" onclick="saveSettings('config/faq', currentFAQ)">Зберегти FAQ</button>
+                </div>
+
+                <div class="set-card">
+                    <h4>📝 Швидкі відповіді (Для адміна)</h4>
+                    <p style="font-size:11px; color:#666">Ці кнопки з'являться над полем вводу в чаті.</p>
+                    <div id="script-editor-list"></div>
+                    <button class="btn-black" onclick="addScript()">+ Додати скрипт</button>
+                    <button class="btn-black" style="background:var(--accent); margin-top:10px" onclick="saveSettings('config/scripts', currentScripts)">Зберегти скрипти</button>
                 </div>
             </div>
         </main>
@@ -160,6 +149,8 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    let curId = null, mode = 'active', currentFAQ = [], currentScripts = [];
+
     function play() { const s = document.getElementById('snd-click'); s.currentTime=0; s.volume=0.2; s.play().catch(()=>{}); }
 
     function nav(tab, el) {
@@ -169,25 +160,75 @@
         document.getElementById('view-' + tab).style.display = 'flex';
         el.classList.add('active');
         document.getElementById('side-panel').style.display = (tab === 'support' ? 'flex' : 'none');
-        if(tab === 'settings') loadFAQForEditing();
+        if(tab === 'settings') loadSettings();
     }
 
-    let curId = null, mode = 'active';
+    // LOAD SCRIPTS INTO CHAT
+    db.ref('config/scripts').on('value', snap => {
+        const scripts = snap.val() || [];
+        const containers = [document.getElementById('support-scripts'), document.getElementById('comm-scripts')];
+        containers.forEach(c => {
+            c.innerHTML = '';
+            scripts.forEach(s => {
+                const btn = document.createElement('button');
+                btn.className = 'script-btn';
+                btn.innerText = s.title;
+                btn.onclick = () => {
+                    const input = c.nextElementSibling.querySelector('input');
+                    input.value = s.text;
+                    input.focus();
+                };
+                c.appendChild(btn);
+            });
+        });
+    });
 
-    function setMode(m) {
-        mode = m;
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        document.getElementById(m === 'active' ? 'f-act' : 'f-arc').classList.add('active');
-        loadList();
+    // SETTINGS LOGIC
+    function loadSettings() {
+        db.ref('config').once('value', snap => {
+            const data = snap.val() || {};
+            currentFAQ = data.faq || [];
+            currentScripts = data.scripts || [];
+            renderFAQ();
+            renderScripts();
+        });
     }
 
-    // ЛІЧИЛЬНИКИ
+    function renderFAQ() {
+        const cont = document.getElementById('faq-editor-list');
+        cont.innerHTML = '';
+        currentFAQ.forEach((f, i) => {
+            cont.innerHTML += `<div style="border:1px solid #eee; padding:10px; border-radius:10px; margin-bottom:10px">
+                <input class="input-std" value="${f.q}" onchange="currentFAQ[${i}].q=this.value" placeholder="Питання">
+                <textarea class="input-std" onchange="currentFAQ[${i}].a=this.value" placeholder="Відповідь">${f.a}</textarea>
+                <button onclick="currentFAQ.splice(${i},1);renderFAQ()" style="color:red; background:none; border:none; font-size:10px">Видалити</button>
+            </div>`;
+        });
+    }
+
+    function renderScripts() {
+        const cont = document.getElementById('script-editor-list');
+        cont.innerHTML = '';
+        currentScripts.forEach((s, i) => {
+            cont.innerHTML += `<div style="border:1px solid #eee; padding:10px; border-radius:10px; margin-bottom:10px">
+                <input class="input-std" value="${s.title}" onchange="currentScripts[${i}].title=this.value" placeholder="Заголовок кнопки">
+                <textarea class="input-std" onchange="currentScripts[${i}].text=this.value" placeholder="Текст шаблону">${s.text}</textarea>
+                <button onclick="currentScripts.splice(${i},1);renderScripts()" style="color:red; background:none; border:none; font-size:10px">Видалити</button>
+            </div>`;
+        });
+    }
+
+    function addFAQ() { currentFAQ.push({q:'', a:''}); renderFAQ(); }
+    function addScript() { currentScripts.push({title:'', text:''}); renderScripts(); }
+    function saveSettings(path, data) { db.ref(path).set(data).then(() => alert('Збережено!')); }
+
+    // REST OF YOUR CORE LOGIC (MODIFIED FOR INTEGRATION)
     db.ref('active_chats').on('value', snap => {
         const n = snap.numChildren();
         document.getElementById('b-total').innerText = n;
         document.getElementById('b-act').innerText = n;
+        loadList();
     });
-    db.ref('closed_chats').on('value', snap => document.getElementById('b-arc').innerText = snap.numChildren());
 
     function loadList() {
         const path = mode === 'active' ? 'active_chats' : 'closed_chats';
@@ -205,8 +246,7 @@
 
     function selectS(id) {
         document.getElementById('active-user').innerText = "Клієнт: " + id.substring(1,9);
-        const path = mode === 'active' ? 'support/' : 'archive/';
-        db.ref(path + id).on('value', snap => {
+        db.ref('support/' + id).on('value', snap => {
             const area = document.getElementById('support-msgs'); area.innerHTML = '';
             snap.forEach(m => {
                 const d = m.val();
@@ -219,98 +259,35 @@
         });
     }
 
-    function sendS(e) {
-        e.preventDefault(); const i = document.getElementById('s-input');
-        if(!curId || !i.value) return;
-        db.ref('support/'+curId).push({text: i.value, type: 'admin', ts: Date.now()});
-        db.ref('active_chats/'+curId).update({lastMsg: "Ви: "+i.value, ts: Date.now()});
-        i.value = '';
-    }
+    function sendS(e) { e.preventDefault(); const i = document.getElementById('s-input'); if(!curId || !i.value) return; db.ref('support/'+curId).push({text: i.value, type: 'admin', ts: Date.now()}); i.value = ''; }
+    function sendC(e) { e.preventDefault(); const i = document.getElementById('c-input'); if(i.value) db.ref('messages').push({uid:'SHOP', name:'ADMIN', text:i.value, ts:Date.now()}); i.value=''; }
 
-    // FAQ EDITOR LOGIC
-    let currentFAQ = [];
-    function loadFAQForEditing() {
-        db.ref('config/faq').once('value', snap => {
-            currentFAQ = snap.val() || [
-                {q: "Де моє замовлення? 📦", a: "Зазвичай доставка займає 1-3 дні. Напишіть номер замовлення!"},
-                {q: "Графік роботи? 🕒", a: "Ми на зв’язку з 9:00 до 20:00."}
-            ];
-            renderFAQEditor();
-        });
-    }
-
-    function renderFAQEditor() {
-        const container = document.getElementById('faq-list-container');
-        container.innerHTML = '';
-        currentFAQ.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.className = 'faq-item-row';
-            div.innerHTML = `
-                <label style="font-size:11px; font-weight:bold;">Питання (кнопка):</label>
-                <input type="text" class="faq-input" value="${item.q}" onchange="updateFAQData(${index}, 'q', this.value)">
-                <label style="font-size:11px; font-weight:bold;">Відповідь бота:</label>
-                <textarea class="faq-input" style="height:60px; resize:none;">${item.a}</textarea>
-                <button class="btn-del-faq" onclick="removeFAQItem(${index})">Видалити</button>
-            `;
-            // Окремий listener для відповіді
-            div.querySelector('textarea').onchange = (e) => updateFAQData(index, 'a', e.target.value);
-            container.appendChild(div);
-        });
-    }
-
-    function updateFAQData(index, field, value) { currentFAQ[index][field] = value; }
-    function addFAQItem() { currentFAQ.push({q: "Нове питання", a: "Нова відповідь"}); renderFAQEditor(); }
-    function removeFAQItem(index) { currentFAQ.splice(index, 1); renderFAQEditor(); }
-    
-    function saveFAQToFirebase() {
-        db.ref('config/faq').set(currentFAQ).then(() => {
-            alert("✅ FAQ оновлено! Клієнти побачать зміни при наступному відкритті чату.");
-        });
-    }
-
-    // Решта коду без змін...
     db.ref('presence').on('value', snap => {
-        const container = document.getElementById('u-cards'); container.innerHTML = '';
+        const cont = document.getElementById('u-cards'); cont.innerHTML = '';
         snap.forEach(c => {
             const u = c.val();
-            const color = u.phone ? 'var(--success)' : (u.requirePhone ? 'var(--warning)' : '#ccc');
-            const card = document.createElement('div');
-            card.className = 'u-card';
-            card.innerHTML = `
-                <div class="u-info">
-                    <div class="u-avatar">${(u.name||'?')[0]}<div class="u-dot" style="background:${color}"></div></div>
-                    <div><b>${u.name||'Гість'}</b><br><small style="font-size:10px">${u.phone||'Без номера'}</small></div>
+            cont.innerHTML += `<div class="u-card">
+                <b>${u.name || 'Гість'}</b><br>
+                <div style="display:flex; gap:5px; margin-top:5px">
+                    <button onclick="uAct('${c.key}','phone')" style="font-size:10px">📱 №</button>
+                    <button onclick="uAct('${c.key}','ban')" style="font-size:10px">🚫 Бан</button>
                 </div>
-                <div class="u-actions">
-                    <button class="u-btn" onclick="uAct('${c.key}','msg')">✉️</button>
-                    <button class="u-btn" onclick="uAct('${c.key}','phone')">📱</button>
-                    <button class="u-btn" onclick="uAct('${c.key}','ban')">🚫</button>
-                </div>`;
-            container.appendChild(card);
+            </div>`;
         });
     });
 
-    function uAct(uid, t) {
-        if(t==='msg') { const m=prompt("Текст:"); if(m) db.ref('private_messages/'+uid).push({text:m, ts:Date.now()}); }
-        if(t==='phone') { if(confirm("Запит?")) db.ref('presence/'+uid).update({requirePhone:true, phoneProvided:false}); }
-        if(t==='ban') { if(confirm("Бан?")) db.ref('banned_users/'+uid).set({ts:Date.now()}); }
-    }
-
-    function sendC(e) { e.preventDefault(); const i=document.getElementById('c-input'); if(i.value) db.ref('messages').push({uid:'SHOP', name:'ADMIN', text:i.value, ts:Date.now()}); i.value=''; }
-    db.ref('messages').limitToLast(30).on('value', snap => {
+    db.ref('messages').limitToLast(20).on('value', snap => {
         const area = document.getElementById('comm-msgs'); area.innerHTML = '';
         snap.forEach(c => {
             const m = c.val();
             const div = document.createElement('div');
             div.className = `bubble ${m.uid==='SHOP'?'out':'in'}`;
             div.style.alignSelf = m.uid==='SHOP'?'flex-end':'flex-start';
-            div.innerHTML = `<div class="msg-del" onclick="delM('${c.key}')">✕</div><small style="display:block;font-size:9px;opacity:0.5">${m.name}</small>${m.text}`;
+            div.innerHTML = `<small style="display:block;font-size:9px;opacity:0.5">${m.name}</small>${m.text}`;
             area.appendChild(div);
         });
         area.scrollTop = area.scrollHeight;
     });
-
-    function delM(mid) { if(confirm("Видалити?")) db.ref('messages/'+mid).remove(); }
 
     function archiveChat() {
         if(!curId) return;
@@ -319,12 +296,9 @@
             db.ref('closed_chats/'+curId).set({ts: Date.now(), lastMsg: "Закрито"});
             db.ref('support/'+curId).remove();
             db.ref('active_chats/'+curId).remove();
-            curId = null; document.getElementById('support-msgs').innerHTML = '';
-            document.getElementById('side-panel').classList.remove('hidden');
+            curId = null; document.getElementById('side-panel').classList.remove('hidden');
         });
     }
-
-    loadList();
 </script>
 </body>
 </html>

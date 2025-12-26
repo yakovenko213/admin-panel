@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Latiao CRM PRO | Manual Order Lookup</title>
+    <title>Latiao CRM PRO | KeyCRM Integration</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #e62117; --bg: #f8f9fa; --sidebar: #ffffff; --border: #e4e6eb; --keycrm: #3e5266; --success: #34c759; }
-        body { font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
+        :root { --primary: #e62117; --bg: #f8f9fa; --sidebar: #ffffff; --border: #e4e6eb; --keycrm: #3e5266; --text: #1c1e21; }
+        body { font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); color: var(--text); overflow: hidden; }
         
         /* Sidebar */
         .sidebar { width: 320px; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); text-align: center; color: var(--primary); }
-        .nav-menu { padding: 10px; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); text-align: center; }
+        .sidebar-header h3 { margin: 0; color: var(--primary); font-weight: 800; }
+        .nav-menu { padding: 10px; flex: 1; overflow-y: auto; }
         .nav-link { padding: 12px 15px; cursor: pointer; border-radius: 8px; border: none; background: none; text-align: left; font-weight: 600; width: 100%; color: #65676b; margin-bottom: 5px; transition: 0.2s; }
         .nav-link.active { background: #fff1f0; color: var(--primary); }
         
@@ -22,199 +23,235 @@
         .filter-btn { flex: 1; padding: 10px; border: none; background: none; font-size: 11px; font-weight: 700; cursor: pointer; color: #888; text-transform: uppercase; }
         .filter-btn.active { color: var(--primary); border-bottom: 2px solid var(--primary); background: #fff; }
         
-        .chat-scroll { flex: 1; overflow-y: auto; }
-        .chat-card { padding: 15px; border-bottom: 1px solid #f0f2f5; cursor: pointer; border-left: 4px solid transparent; }
+        .chat-card { padding: 15px; border-bottom: 1px solid #f0f2f5; cursor: pointer; transition: 0.2s; border-left: 4px solid transparent; }
         .chat-card.active { background: #fef2f2; border-left-color: var(--primary); }
+        .chat-card strong { font-size: 13px; color: #333; }
+        .chat-card small { color: #888; font-size: 11px; display: block; margin-top: 4px; }
 
         /* Main Content */
-        .main { flex: 1; display: flex; flex-direction: column; background: #fff; }
+        .main { flex: 1; display: flex; flex-direction: column; background: #fff; position: relative; }
         .tab-content { display: none; flex: 1; overflow: hidden; flex-direction: column; }
         .tab-content.active { display: flex; }
 
-        /* KeyCRM Integration UI */
+        /* Controls */
         .chat-controls { padding: 12px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: center; background: #fff; }
-        .btn-action { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); background: #fff; font-size: 12px; cursor: pointer; font-weight: 600; }
+        .btn-action { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); background: #fff; font-size: 12px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .btn-action:hover { background: #f9f9f9; }
         .btn-key { background: var(--keycrm); color: #fff; border: none; }
 
-        #keycrm-res { background: #f4f6f8; padding: 15px; border-bottom: 1px solid #ddd; display: none; max-height: 250px; overflow-y: auto; }
-        .manual-search-box { display: flex; gap: 8px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dotted #ccc; }
-        .manual-search-box input { flex: 1; padding: 8px 12px; border-radius: 6px; border: 1px solid #ddd; outline: none; font-size: 13px; }
+        /* KeyCRM UI */
+        #keycrm-res { background: #f8fafc; padding: 15px; border-bottom: 1px solid #ddd; display: none; max-height: 300px; overflow-y: auto; }
+        .manual-search-box { display: flex; gap: 8px; margin-bottom: 12px; }
+        .manual-search-box input { flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; }
         
-        .order-item { background: #fff; border: 1px solid #ddd; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .order-badge { background: #e1f5fe; color: #01579b; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        .order-item { background: #fff; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .order-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .order-status { padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; background: #e2e8f0; }
+        .product-tag { font-size: 12px; color: #334155; display: block; margin: 4px 0; }
+        .order-footer { font-size: 11px; color: #64748b; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; }
 
-        /* Messaging */
-        .msg-area { flex: 1; padding: 20px; overflow-y: auto; background: #f0f2f5; display: flex; flex-direction: column; gap: 10px; }
-        .scm { padding: 10px 14px; border-radius: 18px; max-width: 70%; font-size: 14px; position: relative; }
-        .scm.user { align-self: flex-start; background: #fff; border: 1px solid #ddd; }
+        /* Messages */
+        .msg-area { flex: 1; padding: 20px; overflow-y: auto; background: #f1f5f9; display: flex; flex-direction: column; gap: 10px; }
+        .scm { padding: 10px 14px; border-radius: 18px; max-width: 75%; font-size: 14px; line-height: 1.5; }
+        .scm.user { align-self: flex-start; background: #fff; border: 1px solid #e2e8f0; color: #1e293b; }
         .scm.admin { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 2px; }
 
-        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; padding: 20px; }
-        .stat-box { background: #fff; border: 1px solid #eee; padding: 20px; border-radius: 15px; text-align: center; }
-        .stat-box p { font-size: 26px; font-weight: 800; color: var(--primary); margin: 5px 0; }
+        .input-form { padding: 15px 20px; background: #fff; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+        .input-form input { flex: 1; padding: 12px 18px; border-radius: 25px; border: 1px solid #cbd5e1; outline: none; }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
-        <div class="sidebar-header"><h3>LATIAO CRM</h3></div>
-        <nav class="nav-menu">
+        <div class="sidebar-header"><h3>Latiao CRM</h3></div>
+        <div class="nav-menu">
             <button class="nav-link active" onclick="switchTab('chats')">💬 Діалоги</button>
-            <button class="nav-link" onclick="switchTab('stats')">📊 Аналітика</button>
-            <button class="nav-link" onclick="switchTab('contacts')">👥 Клієнти</button>
-        </nav>
-        <div class="chat-filters">
-            <button class="filter-btn active" id="f-open" onclick="toggleChatList('active')">Відкриті</button>
-            <button class="filter-btn" id="f-closed" onclick="toggleChatList('closed')">Архів</button>
+            <button class="nav-link" onclick="switchTab('stats')">📊 Статистика</button>
+            <button class="nav-link" onclick="switchTab('contacts')">👥 Покупці</button>
         </div>
-        <div id="chat-list" class="chat-scroll"></div>
+        <div class="chat-filters">
+            <button class="filter-btn active" id="f-open" onclick="toggleList('active')">Відкриті</button>
+            <button class="filter-btn" id="f-closed" onclick="toggleList('closed')">Архів</button>
+        </div>
+        <div id="chat-list" class="nav-menu"></div>
     </aside>
 
     <main class="main">
         <section id="tab-chats" class="tab-content active">
             <div class="chat-controls">
                 <button class="btn-action" onclick="requestPhone()">📞 Запитати тел.</button>
-                <button class="btn-action btn-key" onclick="toggleKeyPanel()">🔍 Пошук KeyCRM</button>
-                <button class="btn-action" style="margin-left:auto;" onclick="closeChat()">🔒 Закрити</button>
+                <button class="btn-action btn-key" onclick="toggleKey()">🔍 KeyCRM Пошук</button>
+                <button class="btn-action" style="margin-left:auto" onclick="archiveChat()">🔒 В архів</button>
             </div>
-            
+
             <div id="keycrm-res">
                 <div class="manual-search-box">
-                    <input type="text" id="manual-phone" placeholder="Введіть номер телефону...">
-                    <button class="btn-action btn-key" onclick="manualSearch()">Шукати</button>
+                    <input type="text" id="manual-phone" placeholder="Введіть номер телефону (380...)" />
+                    <button class="btn-action btn-key" onclick="searchKey()">Шукати</button>
                 </div>
-                <div id="orders-list">Оберіть чат або введіть номер для пошуку...</div>
+                <div id="orders-list"></div>
             </div>
 
             <div id="msg-area" class="msg-area"></div>
-            
-            <form style="padding: 15px; display: flex; gap: 10px; border-top: 1px solid #eee;" onsubmit="sendReply(event)">
-                <input type="text" id="admin-reply" style="flex:1; padding: 12px 20px; border-radius: 25px; border: 1px solid #ddd; outline: none;" placeholder="Повідомлення..." autocomplete="off">
-                <button type="submit" style="background:var(--primary); color:#fff; border:none; width: 45px; height: 45px; border-radius:50%; cursor:pointer;">➤</button>
+
+            <form class="input-form" onsubmit="sendMsg(event)">
+                <input type="text" id="admin-input" placeholder="Напишіть відповідь..." autocomplete="off">
+                <button type="submit" class="btn-action btn-key" style="border-radius: 50%; width: 45px; height: 45px;">➤</button>
             </form>
         </section>
 
-        <section id="tab-stats" class="tab-content" style="padding: 20px;"><div class="stat-grid" id="stats-area">Завантаження статистики...</div></section>
-        <section id="tab-contacts" class="tab-content" style="padding: 20px;"><h2>База номерів</h2><div id="contacts-area"></div></section>
+        <section id="tab-stats" class="tab-content" style="padding: 30px;">
+            <h2>Аналітика</h2>
+            <div id="stats-grid" class="nav-menu">
+                <p>Завантаження даних...</p>
+            </div>
+        </section>
+
+        <section id="tab-contacts" class="tab-content" style="padding: 30px;">
+            <h2>База клієнтів</h2>
+            <div id="contacts-list"></div>
+        </section>
     </main>
 
 <script>
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxAA0ivXrsxgq73yDWF4omkw5ENQIIKrmCzenYT9ZECiP0SnioZhJzXyFkWt3eSPQUAw/exec";
+    // ВСТАВЛЕНЕ ВАШЕ ПОСИЛАННЯ НА GOOGLE SCRIPT
+    const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbw9DvyEo9K9ef01MYjwYHhtzDT02NkiEOdXTBHDS5UX8ZrS3hsAj8hnDVLx45s8oFHFXw/exec";
     
     const firebaseConfig = { databaseURL: "https://latiao-chat-default-rtdb.firebaseio.com" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    
-    let currentId = null;
-    let listFilter = 'active';
 
-    function switchTab(tab) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-        document.getElementById('tab-' + tab).classList.add('active');
+    let curId = null;
+    let listType = 'active';
+
+    function switchTab(t) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        document.getElementById('tab-' + t).classList.add('active');
         event.currentTarget.classList.add('active');
     }
 
-    function toggleChatList(status) {
-        listFilter = status;
+    function toggleList(type) {
+        listType = type;
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('f-' + (status === 'active' ? 'open' : 'closed')).classList.add('active');
-        loadChats();
+        document.getElementById('f-' + (type === 'active' ? 'open' : 'closed')).classList.add('active');
+        renderList();
     }
 
-    function loadChats() {
-        const path = listFilter === 'active' ? 'active_chats' : 'closed_chats';
+    function renderList() {
+        const path = listType === 'active' ? 'active_chats' : 'closed_chats';
         db.ref(path).on('value', snap => {
-            const container = document.getElementById('chat-list');
-            container.innerHTML = '';
+            const list = document.getElementById('chat-list');
+            list.innerHTML = '';
             snap.forEach(child => {
+                const c = child.val();
                 const div = document.createElement('div');
-                div.className = `chat-card ${currentId === child.key ? 'active' : ''}`;
-                div.innerHTML = `<strong>ID: ${child.key.substring(0, 10)}</strong><br><small>${child.val().lastMsg || '...'}</small>`;
+                div.className = `chat-card ${curId === child.key ? 'active' : ''}`;
+                div.innerHTML = `<strong>ID: ${child.key.substring(0, 10)}</strong><small>${c.lastMsg || 'Новий діалог'}</small>`;
                 div.onclick = () => selectChat(child.key);
-                container.appendChild(div);
+                list.appendChild(div);
             });
         });
     }
 
     function selectChat(id) {
-        currentId = id;
-        loadChats();
+        curId = id;
+        renderList();
         document.getElementById('keycrm-res').style.display = 'none';
         
-        // Підставляємо номер автоматично, якщо він є
         db.ref('contacts/' + id).once('value', s => {
-            const phone = s.exists() ? s.val().phone : "";
+            const phone = s.exists() ? s.val().phone : '';
             document.getElementById('manual-phone').value = phone;
         });
 
-        const path = listFilter === 'active' ? 'support/' : 'archive/';
+        const path = listType === 'active' ? 'support/' : 'archive/';
         db.ref(path + id).on('value', snap => {
             const area = document.getElementById('msg-area');
             area.innerHTML = '';
             snap.forEach(m => {
-                const d = m.val();
+                const data = m.val();
                 const div = document.createElement('div');
-                div.className = 'scm ' + d.type;
-                div.innerText = d.text;
+                div.className = 'scm ' + data.type;
+                div.innerText = data.text;
                 area.appendChild(div);
             });
             area.scrollTop = area.scrollHeight;
         });
     }
 
-    function toggleKeyPanel() {
-        const panel = document.getElementById('keycrm-res');
-        const isHidden = panel.style.display === 'none';
-        panel.style.display = isHidden ? 'block' : 'none';
-        if(isHidden && document.getElementById('manual-phone').value) manualSearch();
+    function toggleKey() {
+        const p = document.getElementById('keycrm-res');
+        p.style.display = p.style.display === 'none' ? 'block' : 'none';
     }
 
-    async function manualSearch() {
-        const phoneInput = document.getElementById('manual-phone');
-        const ordersList = document.getElementById('orders-list');
-        const phone = phoneInput.value.replace(/\D/g, '');
-        
-        if(!phone) return alert("Введіть номер телефону!");
-        
-        ordersList.innerHTML = "⌛ Шукаємо в KeyCRM...";
-        
+    async function searchKey() {
+        const phone = document.getElementById('manual-phone').value.replace(/\D/g, '');
+        if (!phone) return alert("Введіть номер!");
+        const list = document.getElementById('orders-list');
+        list.innerHTML = "⌛ Пошук у KeyCRM...";
+
         try {
-            const response = await fetch(`${GOOGLE_SCRIPT_URL}?phone=${phone}`, { redirect: 'follow' });
-            const data = await response.json();
+            const res = await fetch(`${GOOGLE_URL}?phone=${phone}`, { redirect: 'follow' });
+            const result = await res.json();
             
-            if (data.data && data.data.length > 0) {
-                ordersList.innerHTML = '';
-                data.data.forEach(order => {
-                    ordersList.innerHTML += `
+            // Якщо API повернуло замовлення
+            if (result.data && result.data.length > 0) {
+                list.innerHTML = '';
+                result.data.forEach(o => {
+                    const prod = o.products && o.products[0] ? o.products[0].name : "Товар не вказано";
+                    const ttn = o.shipping && o.shipping.tracking_code ? o.shipping.tracking_code : "Немає ТТН";
+                    const statusName = o.status ? o.status.name : "Новий";
+                    const statusColor = o.status && o.status.color ? o.status.color : "#e2e8f0";
+
+                    list.innerHTML += `
                         <div class="order-item">
-                            <div style="display:flex; justify-content:space-between;">
-                                <b>Замовлення №${order.id}</b>
-                                <span class="order-badge">${order.status ? order.status.name : "Новий"}</span>
+                            <div class="order-header">
+                                <b>№${o.id}</b>
+                                <span class="order-status" style="background:${statusColor}; color: white; padding: 2px 8px; border-radius: 4px;">${statusName}</span>
                             </div>
-                            <div style="margin: 5px 0;">📦 ${order.products && order.products[0] ? order.products[0].name : "Товар"}</div>
-                            <div style="font-size:11px; color:#555;">Сума: ${order.grand_total}грн | ТТН: ${order.shipping ? order.shipping.tracking_code : "-"}</div>
+                            <span class="product-tag">📦 ${prod}</span>
+                            <div class="order-footer">
+                                <span>💰 <b>${o.grand_total} ${o.currency_code || 'грн'}</b></span>
+                                <span>🚚 <code>${ttn}</code></span>
+                            </div>
                         </div>`;
                 });
             } else {
-                ordersList.innerHTML = `❌ Замовлень для ${phone} не знайдено.`;
+                list.innerHTML = "❌ Нічого не знайдено для " + phone;
             }
         } catch (e) {
-            ordersList.innerHTML = "⚠️ Помилка з'єднання з Google Script.";
+            list.innerHTML = "⚠️ Помилка з'єднання з KeyCRM.";
         }
     }
 
-    function sendReply(e) {
+    function sendMsg(e) {
         e.preventDefault();
-        const input = document.getElementById('admin-reply');
-        if(!currentId || !input.value.trim()) return;
-        db.ref('support/' + currentId).push({ text: input.value, type: 'admin', ts: Date.now() });
-        db.ref('active_chats/' + currentId).update({ lastMsg: "Ви: " + input.value, ts: Date.now() });
+        const input = document.getElementById('admin-input');
+        if (!curId || !input.value.trim()) return;
+        const text = input.value;
+        db.ref('support/' + curId).push({ text, type: 'admin', ts: Date.now() });
+        db.ref('active_chats/' + curId).update({ lastMsg: "Ви: " + text, ts: Date.now() });
         input.value = '';
     }
 
-    // Інші базові функції...
-    loadChats();
+    function archiveChat() {
+        if (!curId || confirm('Архівувати?')) {
+            db.ref('support/' + curId).once('value', snap => {
+                db.ref('archive/' + curId).set(snap.val());
+                db.ref('closed_chats/' + curId).set({ ts: Date.now(), lastMsg: "Архівовано" });
+                db.ref('support/' + curId).remove();
+                db.ref('active_chats/' + curId).remove();
+                curId = null; renderList();
+                document.getElementById('msg-area').innerHTML = '';
+            });
+        }
+    }
+
+    function requestPhone() {
+        if (curId) db.ref('support/' + curId).push({ text: "Будь ласка, введіть ваш номер телефону для замовлення:", type: 'admin', ts: Date.now() });
+    }
+
+    renderList();
 </script>
 </body>
 </html>

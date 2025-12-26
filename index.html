@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Latiao CRM PRO | Community Manager</title>
+    <title>Latiao CRM PRO | FAQ Editor</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -82,6 +82,14 @@
         /* FOOTER */
         .footer { padding: 10px 15px; border-top: 1px solid var(--border); display: flex; gap: 10px; background: #fff; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
         .footer input { flex: 1; height: 44px; padding: 0 18px; border-radius: 22px; border: 1px solid #eee; background: #f5f5f5; font-size: 16px; }
+
+        /* SETTINGS - FAQ EDITOR */
+        .settings-area { padding: 20px; overflow-y: auto; height: 100%; background: #f9f9fb; }
+        .faq-editor-card { background: #fff; padding: 20px; border-radius: 20px; border: 1px solid var(--border); max-width: 600px; margin-bottom: 20px; }
+        .faq-item-row { display: flex; flex-direction: column; gap: 10px; padding: 15px; border: 1px solid #eee; border-radius: 15px; margin-bottom: 15px; background: #fff; }
+        .faq-input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ddd; font-size: 14px; }
+        .btn-add { background: #000; color: #fff; border: none; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        .btn-del-faq { background: #fee2e2; color: #ef4444; border: none; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; align-self: flex-end; }
     </style>
 </head>
 <body>
@@ -130,6 +138,21 @@
                 <div id="u-cards"></div>
             </div>
         </main>
+
+        <main class="viewport view-tab" id="view-settings" style="display:none;">
+            <div class="settings-area">
+                <div class="faq-editor-card">
+                    <h3 style="margin-top:0">⚙️ Налаштування FAQ</h3>
+                    <p style="font-size: 13px; color: #666;">Тут ви можете змінити питання та відповіді, які клієнт бачить при відкритті чату.</p>
+                    
+                    <div id="faq-list-container">
+                        </div>
+                    
+                    <button class="btn-add" onclick="addFAQItem()">+ Додати нове питання</button>
+                    <button class="btn-add" style="background: var(--accent); margin-top: 20px;" onclick="saveFAQToFirebase()">💾 Зберегти зміни</button>
+                </div>
+            </div>
+        </main>
     </div>
 
 <script>
@@ -146,6 +169,7 @@
         document.getElementById('view-' + tab).style.display = 'flex';
         el.classList.add('active');
         document.getElementById('side-panel').style.display = (tab === 'support' ? 'flex' : 'none');
+        if(tab === 'settings') loadFAQForEditing();
     }
 
     let curId = null, mode = 'active';
@@ -203,7 +227,48 @@
         i.value = '';
     }
 
-    // СПІЛЬНОТА - ЮЗЕРИ
+    // FAQ EDITOR LOGIC
+    let currentFAQ = [];
+    function loadFAQForEditing() {
+        db.ref('config/faq').once('value', snap => {
+            currentFAQ = snap.val() || [
+                {q: "Де моє замовлення? 📦", a: "Зазвичай доставка займає 1-3 дні. Напишіть номер замовлення!"},
+                {q: "Графік роботи? 🕒", a: "Ми на зв’язку з 9:00 до 20:00."}
+            ];
+            renderFAQEditor();
+        });
+    }
+
+    function renderFAQEditor() {
+        const container = document.getElementById('faq-list-container');
+        container.innerHTML = '';
+        currentFAQ.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'faq-item-row';
+            div.innerHTML = `
+                <label style="font-size:11px; font-weight:bold;">Питання (кнопка):</label>
+                <input type="text" class="faq-input" value="${item.q}" onchange="updateFAQData(${index}, 'q', this.value)">
+                <label style="font-size:11px; font-weight:bold;">Відповідь бота:</label>
+                <textarea class="faq-input" style="height:60px; resize:none;">${item.a}</textarea>
+                <button class="btn-del-faq" onclick="removeFAQItem(${index})">Видалити</button>
+            `;
+            // Окремий listener для відповіді
+            div.querySelector('textarea').onchange = (e) => updateFAQData(index, 'a', e.target.value);
+            container.appendChild(div);
+        });
+    }
+
+    function updateFAQData(index, field, value) { currentFAQ[index][field] = value; }
+    function addFAQItem() { currentFAQ.push({q: "Нове питання", a: "Нова відповідь"}); renderFAQEditor(); }
+    function removeFAQItem(index) { currentFAQ.splice(index, 1); renderFAQEditor(); }
+    
+    function saveFAQToFirebase() {
+        db.ref('config/faq').set(currentFAQ).then(() => {
+            alert("✅ FAQ оновлено! Клієнти побачать зміни при наступному відкритті чату.");
+        });
+    }
+
+    // Решта коду без змін...
     db.ref('presence').on('value', snap => {
         const container = document.getElementById('u-cards'); container.innerHTML = '';
         snap.forEach(c => {
@@ -217,21 +282,20 @@
                     <div><b>${u.name||'Гість'}</b><br><small style="font-size:10px">${u.phone||'Без номера'}</small></div>
                 </div>
                 <div class="u-actions">
-                    <button class="u-btn" onclick="uAct('${c.key}','msg')" title="Приват">✉️</button>
-                    <button class="u-btn" onclick="uAct('${c.key}','phone')" title="Запит №">📱</button>
-                    <button class="u-btn" onclick="uAct('${c.key}','ban')" title="Бан">🚫</button>
+                    <button class="u-btn" onclick="uAct('${c.key}','msg')">✉️</button>
+                    <button class="u-btn" onclick="uAct('${c.key}','phone')">📱</button>
+                    <button class="u-btn" onclick="uAct('${c.key}','ban')">🚫</button>
                 </div>`;
             container.appendChild(card);
         });
     });
 
     function uAct(uid, t) {
-        if(t==='msg') { const m=prompt("Текст приватного повідомлення:"); if(m) db.ref('private_messages/'+uid).push({text:m, ts:Date.now()}); }
-        if(t==='phone') { if(confirm("Надіслати запит на номер телефону?")) db.ref('presence/'+uid).update({requirePhone:true, phoneProvided:false}); }
-        if(t==='ban') { if(confirm("Забанити користувача?")) db.ref('banned_users/'+uid).set({ts:Date.now()}); }
+        if(t==='msg') { const m=prompt("Текст:"); if(m) db.ref('private_messages/'+uid).push({text:m, ts:Date.now()}); }
+        if(t==='phone') { if(confirm("Запит?")) db.ref('presence/'+uid).update({requirePhone:true, phoneProvided:false}); }
+        if(t==='ban') { if(confirm("Бан?")) db.ref('banned_users/'+uid).set({ts:Date.now()}); }
     }
 
-    // СПІЛЬНОТА - ЧАТ
     function sendC(e) { e.preventDefault(); const i=document.getElementById('c-input'); if(i.value) db.ref('messages').push({uid:'SHOP', name:'ADMIN', text:i.value, ts:Date.now()}); i.value=''; }
     db.ref('messages').limitToLast(30).on('value', snap => {
         const area = document.getElementById('comm-msgs'); area.innerHTML = '';
@@ -246,7 +310,7 @@
         area.scrollTop = area.scrollHeight;
     });
 
-    function delM(mid) { if(confirm("Видалити це повідомлення?")) db.ref('messages/'+mid).remove(); }
+    function delM(mid) { if(confirm("Видалити?")) db.ref('messages/'+mid).remove(); }
 
     function archiveChat() {
         if(!curId) return;

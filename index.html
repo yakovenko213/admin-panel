@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Latiao CRM Mobile & Desktop</title>
+    <title>Latiao CRM Ultimate 2026</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -15,13 +15,15 @@
             --chrome-tab: #ffffff;
             --sidebar-bg: #f8f9fa;
             --border: #e8eaed;
-            --text: #1a1a1b;
+            --success: #34c759;
+            --info: #007aff;
+            --warning: #ffcc00;
         }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--chrome-bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--chrome-bg); color: #1a1a1b; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* --- CHROME TABS ADAPTIVE --- */
+        /* --- CHROME TABS --- */
         .chrome-header { display: flex; align-items: flex-end; padding: 8px 8px 0; gap: 4px; background: var(--chrome-bg); border-bottom: 1px solid #c1c3c8; flex-shrink: 0; }
         .tab {
             position: relative; padding: 10px 15px; min-width: 60px; height: 38px;
@@ -29,135 +31,99 @@
             cursor: pointer; font-size: 13px; font-weight: 600; color: #5f6368;
             display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
         }
-        .tab span { display: none; } /* Текст приховано за замовчуванням для мобільних */
+        .tab span { display: none; }
         .tab.active { background: var(--chrome-tab); color: var(--accent); }
         .tab.active::before { content: ''; position: absolute; bottom: 0; left: -15px; width: 15px; height: 15px; border-bottom-right-radius: 10px; box-shadow: 5px 0 0 0 var(--chrome-tab); }
         .tab.active::after { content: ''; position: absolute; bottom: 0; right: -15px; width: 15px; height: 15px; border-bottom-left-radius: 10px; box-shadow: -5px 0 0 0 var(--chrome-tab); }
         
-        @media (min-width: 768px) {
-            .tab { min-width: 160px; justify-content: flex-start; }
-            .tab span { display: inline; }
-        }
+        @media (min-width: 768px) { .tab { min-width: 160px; justify-content: flex-start; } .tab span { display: inline; } }
 
-        /* --- MAIN LAYOUT --- */
+        /* --- LAYOUT --- */
         .app-shell { flex: 1; display: flex; background: #fff; overflow: hidden; position: relative; }
-        
-        /* Sidebar / Chat List */
-        .sidebar { 
-            width: 100%; height: 100%; background: var(--sidebar-bg); border-right: 1px solid var(--border); 
-            display: flex; flex-direction: column; position: absolute; z-index: 10; transition: transform 0.3s ease;
-        }
+        .sidebar { width: 100%; height: 100%; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: absolute; z-index: 10; transition: transform 0.3s ease; }
         .sidebar.hidden { transform: translateX(-100%); }
+        @media (min-width: 992px) { .sidebar { position: relative; width: 350px; transform: none !important; } }
 
-        @media (min-width: 992px) {
-            .sidebar { position: relative; width: 350px; transform: none !important; }
-        }
-
-        /* Viewport / Message Area */
         .viewport { flex: 1; display: flex; flex-direction: column; background: #fff; width: 100%; }
         
-        /* Navigation for Mobile */
-        .mobile-nav { display: flex; align-items: center; padding: 10px 15px; border-bottom: 1px solid var(--border); background: #fff; gap: 10px; }
-        .back-btn { display: flex; align-items: center; justify-content: center; width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--border); background: #fff; cursor: pointer; font-weight: bold; }
-        @media (min-width: 992px) { .back-btn { display: none; } }
+        /* --- USER CARDS 2.0 --- */
+        .user-mgmt-area { padding: 15px; overflow-y: auto; background: #fdfdfd; }
+        .u-card { 
+            background: #fff; border: 1px solid var(--border); border-radius: 20px; 
+            padding: 16px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .u-header { display: flex; align-items: center; gap: 12px; }
+        .u-avatar { width: 48px; height: 48px; border-radius: 15px; background: #f0f2f5; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; position: relative; }
+        .u-status-dot { position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; border: 3px solid #fff; border-radius: 50%; }
+        
+        .u-details b { font-size: 15px; display: block; }
+        .u-details span { font-size: 11px; font-weight: 700; text-transform: uppercase; }
 
-        /* Filter Chips */
-        .filter-area { padding: 12px; display: flex; gap: 8px; border-bottom: 1px solid var(--border); background: #fff; }
-        .chip { flex: 1; padding: 10px; border-radius: 12px; border: 1px solid var(--border); background: #fff; font-size: 11px; font-weight: 800; cursor: pointer; text-align: center; }
-        .chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .u-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .u-btn { 
+            border: none; padding: 10px; border-radius: 12px; font-weight: 700; font-size: 11px;
+            cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;
+            background: #f1f3f4; color: #444;
+        }
+        .u-btn:active { transform: scale(0.95); }
+        .u-btn.pri { background: rgba(0, 122, 255, 0.1); color: var(--info); }
+        .u-btn.pho { background: rgba(255, 204, 0, 0.1); color: #b08d00; }
+        .u-btn.ban { background: rgba(230, 33, 23, 0.1); color: var(--accent); }
 
-        /* Chat Cards */
-        .chat-list { flex: 1; overflow-y: auto; padding: 10px; }
-        .chat-card { padding: 15px; border-radius: 16px; cursor: pointer; margin-bottom: 8px; border: 1px solid transparent; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .chat-card.active { background: var(--accent-glow); border-color: var(--accent); }
-        .chat-card strong { display: block; font-size: 14px; margin-bottom: 4px; color: var(--text); }
-        .chat-card small { color: #888; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
-
-        /* Messages */
+        /* --- MESSAGES --- */
         .msg-area { flex: 1; padding: 15px; overflow-y: auto; background: #f4f6f8; display: flex; flex-direction: column; gap: 8px; }
         .bubble { padding: 12px 16px; border-radius: 18px; max-width: 85%; font-size: 14px; line-height: 1.5; }
         .bubble.in { align-self: flex-start; background: #fff; border: 1px solid #eee; }
         .bubble.out { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
 
-        /* Community User Cards (Adaptive) */
-        .user-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; padding: 15px; }
-        .u-card { background: #fff; border: 1px solid var(--border); border-radius: 18px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .u-header { display: flex; align-items: center; gap: 12px; }
-        .u-avatar { width: 40px; height: 40px; border-radius: 12px; background: var(--accent-glow); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; }
-        .u-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-        .u-btn { border: none; padding: 10px; border-radius: 10px; cursor: pointer; background: #f1f3f4; font-size: 16px; }
-
-        /* Footer Input */
         .input-form { padding: 12px 15px; border-top: 1px solid var(--border); background: #fff; display: flex; gap: 10px; }
-        .input-form input { flex: 1; padding: 12px 18px; border-radius: 25px; border: 1px solid var(--border); background: #f1f3f4; font-size: 14px; }
-        .btn-send { background: #000; color: #fff; border: none; min-width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
-        /* Settings */
-        .scroll-view { flex: 1; overflow-y: auto; padding: 20px; }
-        .card { background: #fff; border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 15px; }
-        
-        .badge { background: var(--accent); color: white; padding: 2px 6px; border-radius: 8px; font-size: 10px; font-weight: 800; }
+        .input-form input { flex: 1; padding: 12px 18px; border-radius: 25px; border: 1px solid var(--border); background: #f1f3f4; }
+        .btn-send { background: #000; color: #fff; border: none; min-width: 44px; height: 44px; border-radius: 50%; cursor: pointer; }
     </style>
 </head>
 <body>
 
+    <audio id="snd-tab" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
+
     <header class="chrome-header">
-        <div class="tab active" id="t-support" onclick="nav('support', this)">
-            <i style="font-style: normal;">💬</i> <span>Підтримка</span>
-            <div class="badge" id="badge-total">0</div>
-        </div>
-        <div class="tab" onclick="nav('community', this)">
-            <i style="font-style: normal;">🌶️</i> <span>Спільнота</span>
-        </div>
-        <div class="tab" onclick="nav('settings', this)">
-            <i style="font-style: normal;">⚙️</i> <span>Налаштування</span>
-        </div>
+        <div class="tab active" onclick="nav('support', this)"><i>💬</i> <span>Підтримка</span></div>
+        <div class="tab" onclick="nav('community', this)"><i>🌶️</i> <span>Спільнота</span></div>
+        <div class="tab" onclick="nav('settings', this)"><i>⚙️</i> <span>Налаштування</span></div>
     </header>
 
     <div class="app-shell">
-        
         <aside class="sidebar" id="side-panel">
-            <div class="filter-area">
-                <div class="chip active" id="f-act" onclick="setMode('active')">ВІДКРИТІ <span id="badge-act">0</span></div>
-                <div class="chip" id="f-arc" onclick="setMode('archived')">АРХІВ <span id="badge-arc">0</span></div>
-            </div>
-            <div class="chat-list" id="chat-list"></div>
+            <div style="padding:15px; border-bottom:1px solid var(--border); font-weight:800; font-size:12px; color:#888;">АКТИВНІ ЧАТИ</div>
+            <div class="chat-list" id="chat-list" style="overflow-y:auto; flex:1; padding:10px;"></div>
         </aside>
 
         <main class="viewport view-tab active" id="view-support">
-            <div class="mobile-nav">
-                <button class="back-btn" onclick="backToList()">‹</button>
-                <div style="flex:1"><b id="active-chat-title" style="font-size:14px">Оберіть діалог</b></div>
-                <button class="badge" style="border:none; cursor:pointer" onclick="archiveChat()">Архів</button>
+            <div style="padding:10px 15px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px">
+                <button onclick="document.getElementById('side-panel').classList.remove('hidden')" style="padding:5px 10px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer">‹ Назад</button>
+                <b id="chat-title" style="font-size:14px">Оберіть чат</b>
             </div>
             <div class="msg-area" id="support-msgs"></div>
             <form class="input-form" onsubmit="sendS(event)">
-                <input type="text" id="s-input" placeholder="Ваша відповідь..." autocomplete="off">
+                <input type="text" id="s-input" placeholder="Відповідь..." autocomplete="off">
                 <button type="submit" class="btn-send">➤</button>
             </form>
         </main>
 
-        <main class="viewport view-tab" id="view-community" style="display:none; overflow-y:auto">
-            <div style="padding:15px; border-bottom:1px solid var(--border); font-weight:800">ЧАТ СПІЛЬНОТИ</div>
-            <div class="msg-area" id="comm-msgs" style="flex:none; height:400px"></div>
-            <form class="input-form" onsubmit="sendC(event)">
-                <input type="text" id="c-input" placeholder="Від імені SHOP...">
-                <button type="submit" class="btn-send">➤</button>
-            </form>
-            <div class="user-grid" id="comm-users"></div>
-        </main>
-
-        <main class="viewport view-tab" id="view-settings" style="display:none">
-            <div class="scroll-view">
-                <div class="card">
-                    <h3 style="margin-top:0">🤖 Автоматизація</h3>
-                    <label style="font-size:12px; font-weight:700">Текст привітання:</label>
-                    <textarea id="set-welcome" style="width:100%; height:80px; margin:10px 0; border-radius:10px; border:1px solid #ddd; padding:10px;"></textarea>
-                    <button onclick="saveSettings()" style="width:100%; background:var(--accent); color:#fff; border:none; padding:12px; border-radius:10px; font-weight:700">Зберегти</button>
-                </div>
+        <main class="viewport view-tab" id="view-community" style="display:none; flex-direction:row">
+            <div style="flex:1; display:flex; flex-direction:column; border-right:1px solid var(--border)">
+                <div style="padding:15px; border-bottom:1px solid var(--border); font-weight:800">ЧАТ СПІЛЬНОТИ</div>
+                <div class="msg-area" id="comm-msgs"></div>
+                <form class="input-form" onsubmit="sendC(event)">
+                    <input type="text" id="c-input" placeholder="Від SHOP...">
+                    <button type="submit" class="btn-send">➤</button>
+                </form>
+            </div>
+            <div class="user-mgmt-area" style="width:350px;">
+                <h4 style="margin:0 0 15px 0; font-size:12px; color:#888;">УПРАВЛІННЯ КОРИСТУВАЧАМИ</h4>
+                <div id="user-cards-container"></div>
             </div>
         </main>
-
     </div>
 
 <script>
@@ -165,68 +131,36 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let currentId = null;
-    let mode = 'active';
-
-    // MOBILE NAVIGATION LOGIC
-    function backToList() {
-        document.getElementById('side-panel').classList.remove('hidden');
+    function playTab() { 
+        const s = document.getElementById('snd-tab');
+        s.currentTime = 0; s.volume = 0.2; s.play().catch(()=>{}); 
     }
 
     function nav(tab, el) {
+        playTab();
         document.querySelectorAll('.view-tab').forEach(v => v.style.display = 'none');
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.getElementById('view-' + tab).style.display = 'flex';
         el.classList.add('active');
-        
-        const side = document.getElementById('side-panel');
-        if(tab === 'support') {
-            side.style.display = 'flex';
-            if(!currentId) side.classList.remove('hidden');
-        } else {
-            side.style.display = 'none';
-        }
+        document.getElementById('side-panel').style.display = (tab === 'support' ? 'flex' : 'none');
     }
 
-    function setMode(m) {
-        mode = m;
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        document.getElementById(m === 'active' ? 'f-act' : 'f-arc').classList.add('active');
-        loadList();
-    }
+    let curId = null;
 
-    // COUNTERS
     db.ref('active_chats').on('value', snap => {
-        const count = snap.numChildren();
-        document.getElementById('badge-total').innerText = count;
-        document.getElementById('badge-act').innerText = count;
-    });
-    db.ref('closed_chats').on('value', snap => { document.getElementById('badge-arc').innerText = snap.numChildren(); });
-
-    // SUPPORT LIST
-    function loadList() {
-        const path = mode === 'active' ? 'active_chats' : 'closed_chats';
-        db.ref(path).on('value', snap => {
-            const list = document.getElementById('chat-list');
-            list.innerHTML = '';
-            snap.forEach(c => {
-                const div = document.createElement('div');
-                div.className = `chat-card ${currentId === c.key ? 'active' : ''}`;
-                div.innerHTML = `<strong>👤 ${c.key.substring(1,10)}</strong><small>${c.val().lastMsg || '...'}</small>`;
-                div.onclick = () => selectS(c.key);
-                list.appendChild(div);
-            });
+        const list = document.getElementById('chat-list'); list.innerHTML = '';
+        snap.forEach(c => {
+            const div = document.createElement('div');
+            div.style = `padding:12px; border-radius:12px; margin-bottom:8px; cursor:pointer; background:${curId === c.key ? 'var(--accent-glow)' : '#fff'}; border:1px solid ${curId === c.key ? 'var(--accent)' : '#eee'}`;
+            div.innerHTML = `<strong>${c.key.substring(1,9)}</strong><br><small style="color:#888">${c.val().lastMsg || '...'}</small>`;
+            div.onclick = () => { curId = c.key; selectS(c.key); if(window.innerWidth<992) document.getElementById('side-panel').classList.add('hidden'); };
+            list.appendChild(div);
         });
-    }
+    });
 
     function selectS(id) {
-        currentId = id;
-        if(window.innerWidth < 992) {
-            document.getElementById('side-panel').classList.add('hidden');
-        }
-        document.getElementById('active-chat-title').innerText = "Чат: " + id.substring(1,9);
-        const path = mode === 'active' ? 'support/' : 'archive/';
-        db.ref(path + id).on('value', snap => {
+        document.getElementById('chat-title').innerText = "Чат: " + id.substring(1,9);
+        db.ref('support/' + id).on('value', snap => {
             const area = document.getElementById('support-msgs'); area.innerHTML = '';
             snap.forEach(m => {
                 const d = m.val();
@@ -237,69 +171,65 @@
             });
             area.scrollTop = area.scrollHeight;
         });
-        loadList();
     }
 
     function sendS(e) {
         e.preventDefault();
-        const input = document.getElementById('s-input');
-        if(!currentId || !input.value) return;
-        db.ref('support/' + currentId).push({ text: input.value, type: 'admin', ts: Date.now() });
-        db.ref('active_chats/' + currentId).update({ lastMsg: "Ви: " + input.value, ts: Date.now() });
-        input.value = '';
+        const i = document.getElementById('s-input');
+        if(!curId || !i.value) return;
+        db.ref('support/'+curId).push({text: i.value, type: 'admin', ts: Date.now()});
+        db.ref('active_chats/'+curId).update({lastMsg: "Ви: "+i.value});
+        i.value = '';
     }
 
-    // COMMUNITY
+    // Community Users Logic
+    db.ref('presence').on('value', snap => {
+        const container = document.getElementById('user-cards-container');
+        container.innerHTML = '';
+        snap.forEach(c => {
+            const u = childVal = c.val();
+            const uid = c.key;
+            const statusColor = u.phone ? 'var(--success)' : (u.requirePhone ? 'var(--warning)' : '#ccc');
+            const statusText = u.phone ? 'Верифікований' : (u.requirePhone ? 'Очікує №' : 'Гість');
+            
+            const card = document.createElement('div');
+            card.className = 'u-card';
+            card.innerHTML = `
+                <div class="u-header">
+                    <div class="u-avatar">${(u.name||'?')[0]}<div class="u-status-dot" style="background:${statusColor}"></div></div>
+                    <div class="u-details"><b>${u.name || "Гість"}</b><span style="color:${statusColor}">${statusText}</span></div>
+                </div>
+                <div class="u-actions">
+                    <button class="u-btn pri" onclick="uAct('${uid}', 'msg')">✉️ Приват</button>
+                    <button class="u-btn pho" onclick="uAct('${uid}', 'phone')">📱 Запит №</button>
+                    <button class="u-btn ban" onclick="uAct('${uid}', 'ban')">🚫 Бан</button>
+                </div>`;
+            container.appendChild(card);
+        });
+    });
+
+    window.uAct = (uid, type) => {
+        if(type === 'msg') {
+            const t = prompt("Приватне повідомлення:");
+            if(t) db.ref('private_messages/'+uid).push({text: t, ts: Date.now()});
+        }
+        if(type === 'phone') db.ref('presence/'+uid).update({requirePhone: true, phoneProvided: false});
+        if(type === 'ban') if(confirm("Забанити?")) db.ref('banned_users/'+uid).set({ts: Date.now()});
+    };
+
+    function sendC(e) { e.preventDefault(); const i = document.getElementById('c-input'); if(i.value) db.ref('messages').push({uid:'SHOP', name:'ADMIN', text:i.value, ts:Date.now()}); i.value=''; }
     db.ref('messages').limitToLast(20).on('value', snap => {
         const area = document.getElementById('comm-msgs'); area.innerHTML = '';
         snap.forEach(c => {
             const m = c.val();
             const div = document.createElement('div');
-            div.className = `bubble ${m.uid === 'SHOP' ? 'out' : 'in'}`;
-            div.style.alignSelf = m.uid === 'SHOP' ? 'flex-end' : 'flex-start';
+            div.className = `bubble ${m.uid==='SHOP'?'out':'in'}`;
+            div.style.alignSelf = m.uid==='SHOP'?'flex-end':'flex-start';
             div.innerHTML = `<small style="display:block;font-size:9px;opacity:0.5">${m.name}</small>${m.text}`;
             area.appendChild(div);
         });
         area.scrollTop = area.scrollHeight;
     });
-
-    db.ref('presence').on('value', snap => {
-        const list = document.getElementById('comm-users'); list.innerHTML = '';
-        snap.forEach(c => {
-            const u = c.val();
-            const div = document.createElement('div');
-            div.className = 'u-card';
-            div.innerHTML = `
-                <div class="u-header"><div class="u-avatar">${(u.name||'?')[0]}</div><b>${u.name||'Гість'}</b></div>
-                <div class="u-actions">
-                    <button class="u-btn" onclick="uAct('${c.key}','msg')">✉️</button>
-                    <button class="u-btn" onclick="uAct('${c.key}','phone')">📱</button>
-                    <button class="u-btn" onclick="uAct('${c.key}','ban')">🚫</button>
-                </div>`;
-            list.appendChild(div);
-        });
-    });
-
-    function uAct(uid, t) {
-        if(t === 'msg') db.ref('private_messages/'+uid).push({text: prompt("Приват:"), ts: Date.now()});
-        if(t === 'phone') db.ref('presence/'+uid).update({requirePhone: true, phoneProvided: false});
-        if(t === 'ban') confirm('Забанити?') && db.ref('banned_users/'+uid).set({ts: Date.now()});
-    }
-
-    function archiveChat() {
-        if(!currentId) return;
-        db.ref('support/'+currentId).once('value', snap => {
-            db.ref('archive/'+currentId).set(snap.val());
-            db.ref('closed_chats/'+currentId).set({ts: Date.now(), lastMsg: "Закрито"});
-            db.ref('support/'+currentId).remove();
-            db.ref('active_chats/'+currentId).remove();
-            currentId = null; 
-            document.getElementById('support-msgs').innerHTML = '';
-            backToList();
-        });
-    }
-
-    loadList();
 </script>
 </body>
 </html>

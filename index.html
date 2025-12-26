@@ -3,28 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Latiao Ultra CRM 2025 | No-Auth Edition</title>
+    <title>Latiao CRM PRO | Ultimate Control</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --accent: #e62117;
-            --accent-glow: rgba(230, 33, 23, 0.15);
+            --accent-glow: rgba(230, 33, 23, 0.12);
             --chrome-bg: #dfe1e5;
             --chrome-tab: #ffffff;
             --sidebar-bg: #f8f9fa;
             --border: #e8eaed;
-            --glass: rgba(255, 255, 255, 0.7);
+            --glass: rgba(255, 255, 255, 0.8);
             --success: #34c759;
             --info: #007aff;
+            --warning: #ffb900;
         }
 
-        * { box-sizing: border-box; outline: none; transition: all 0.2s ease; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--chrome-bg); color: #1f1f1f; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        * { box-sizing: border-box; outline: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--chrome-bg); color: #1a1a1b; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* --- CHROME TABS NAVIGATION --- */
-        .chrome-header { display: flex; align-items: flex-end; padding: 8px 12px 0; gap: 4px; background: var(--chrome-bg); border-bottom: 1px solid #ccc; }
+        /* --- CHROME TABS UI --- */
+        .chrome-header { display: flex; align-items: flex-end; padding: 8px 12px 0; gap: 4px; background: var(--chrome-bg); border-bottom: 1px solid #c1c3c8; }
         .tab {
             position: relative; padding: 10px 22px; min-width: 170px; height: 38px;
             background: transparent; border-radius: 12px 12px 0 0;
@@ -35,51 +36,49 @@
         .tab.active::before { content: ''; position: absolute; bottom: 0; left: -20px; width: 20px; height: 20px; border-bottom-right-radius: 12px; box-shadow: 10px 0 0 0 var(--chrome-tab); }
         .tab.active::after { content: ''; position: absolute; bottom: 0; right: -20px; width: 20px; height: 20px; border-bottom-left-radius: 12px; box-shadow: -10px 0 0 0 var(--chrome-tab); }
 
-        /* --- LAYOUT STRUCTURE --- */
-        .app-shell { flex: 1; display: flex; background: #fff; position: relative; overflow: hidden; }
-        
-        /* SIDEBAR */
+        /* --- LAYOUT --- */
+        .app-shell { flex: 1; display: flex; background: #fff; overflow: hidden; }
         .sidebar { width: 340px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .sidebar-tools { padding: 15px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; }
-        .filter-chip { flex: 1; padding: 8px; border-radius: 10px; border: 1px solid var(--border); background: #fff; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center; }
-        .filter-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-
-        .chat-list { flex: 1; overflow-y: auto; padding: 10px; }
-        .chat-card { padding: 16px; border-radius: 16px; cursor: pointer; margin-bottom: 8px; border: 1px solid transparent; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .chat-card.active { background: var(--accent-glow); border-color: var(--accent); }
-        .chat-card strong { display: block; font-size: 14px; color: #1a1a1a; }
-        .chat-card small { font-size: 12px; color: #70757a; margin-top: 4px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-        /* CONTENT AREAS */
         .viewport { flex: 1; display: flex; flex-direction: column; background: #fff; }
-        .v-header { padding: 15px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        
-        .messages-container { flex: 1; padding: 25px; overflow-y: auto; background: #f1f3f4; display: flex; flex-direction: column; gap: 12px; }
-        .msg { padding: 12px 18px; border-radius: 20px; max-width: 70%; font-size: 14px; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .msg.in { align-self: flex-start; background: #fff; color: #1a1a1a; border-bottom-left-radius: 4px; }
-        .msg.out { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
-        .msg-del { position: absolute; top: -8px; right: -8px; width: 20px; height: 20px; background: #000; color: #fff; border-radius: 50%; font-size: 10px; display: none; align-items: center; justify-content: center; cursor: pointer; }
-        .msg:hover .msg-del { display: flex; }
 
-        /* --- COMMUNITY DASHBOARD --- */
-        .community-grid { display: grid; grid-template-columns: 1fr 380px; height: 100%; }
-        .user-grid { display: grid; grid-template-columns: 1fr; gap: 12px; padding: 20px; }
-        .user-card { background: #fff; border: 1px solid var(--border); padding: 15px; border-radius: 18px; display: flex; align-items: center; justify-content: space-between; }
-        .user-info { display: flex; align-items: center; gap: 12px; }
-        .avatar-circle { width: 40px; height: 40px; border-radius: 50%; background: var(--accent-glow); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; }
+        /* --- USER MANAGEMENT CARDS --- */
+        .user-list-container { padding: 20px; overflow-y: auto; flex: 1; }
+        .u-card { 
+            background: #fff; border: 1px solid var(--border); border-radius: 20px; 
+            padding: 16px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .u-card:hover { border-color: var(--info); transform: translateY(-2px); }
+        .u-header { display: flex; align-items: center; gap: 12px; }
+        .u-avatar { width: 44px; height: 44px; border-radius: 14px; background: #f0f2f5; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #444; font-size: 18px; }
+        .u-details b { font-size: 15px; color: #1a1a1a; display: block; }
+        .u-details span { font-size: 11px; color: var(--success); font-weight: 700; text-transform: uppercase; }
         
-        /* AD PLANNER STYLES */
-        .ad-planner { background: #f8f9fa; border-radius: 20px; padding: 20px; border: 1px solid var(--border); }
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; font-size: 11px; font-weight: 800; color: #888; text-transform: uppercase; margin-bottom: 6px; }
-        .input-field { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); font-size: 14px; }
-        
-        .btn { padding: 12px 24px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; font-size: 13px; }
-        .btn-red { background: var(--accent); color: #fff; box-shadow: 0 4px 12px var(--accent-glow); }
-        .btn-black { background: #000; color: #fff; }
-        .btn-outline { background: #fff; border: 1px solid var(--border); }
+        .u-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .act-btn { border: none; padding: 10px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: 0.2s; }
+        .act-btn.private { background: var(--accent-glow); color: var(--accent); }
+        .act-btn.phone { background: rgba(0, 122, 255, 0.1); color: var(--info); }
+        .act-btn.ban { background: #f0f2f5; color: #333; }
+        .act-btn:hover { transform: scale(1.05); filter: brightness(0.95); }
 
-        .active-ad-banner { background: #34c759; color: #fff; padding: 10px; border-radius: 10px; font-size: 12px; margin-top: 10px; display: none; }
+        /* --- MESSAGING & ADS --- */
+        .msg-area { flex: 1; padding: 25px; overflow-y: auto; background: #f4f6f8; display: flex; flex-direction: column; gap: 10px; }
+        .bubble { padding: 12px 18px; border-radius: 20px; max-width: 75%; font-size: 14px; position: relative; line-height: 1.5; }
+        .bubble.in { align-self: flex-start; background: #fff; color: #1a1a1a; border-bottom-left-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .bubble.out { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; box-shadow: 0 4px 12px var(--accent-glow); }
+        .msg-info { font-size: 9px; opacity: 0.6; margin-bottom: 4px; display: block; }
+
+        .control-panel { padding: 20px; background: #fff; border-top: 1px solid var(--border); }
+        .tool-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; height: 100%; }
+        
+        /* AD Planner */
+        .ad-box { background: #f8f9fa; padding: 20px; border-radius: 24px; border: 1px solid var(--border); }
+        .input-dark { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid #ddd; background: #fff; font-size: 14px; margin-bottom: 10px; }
+        .btn-black { background: #000; color: #fff; border: none; padding: 12px 24px; border-radius: 14px; font-weight: 700; cursor: pointer; width: 100%; }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .u-card { animation: fadeIn 0.4s ease forwards; }
     </style>
 </head>
 <body>
@@ -89,83 +88,55 @@
         <div class="tab" onclick="nav('community', this)"><span>🌶️ Спільнота</span></div>
         <div class="tab" onclick="nav('settings', this)"><span>⚙️ Налаштування</span></div>
         <div style="flex:1"></div>
-        <div style="padding-bottom:10px; font-size:12px; font-weight:700; color:#999">LATIAO CRM PRO</div>
+        <div style="font-size:11px; font-weight:800; color:#aaa; padding-bottom:10px;">LATIAO CRM ULTIMATE</div>
     </header>
 
     <div class="app-shell">
         
         <aside class="sidebar" id="side-panel">
-            <div class="sidebar-tools">
-                <div class="filter-chip active" id="f-act" onclick="setFilter('active')">ВІДКРИТІ</div>
-                <div class="filter-chip" id="f-arc" onclick="setFilter('archived')">АРХІВ</div>
-            </div>
-            <div class="chat-list" id="chat-list"></div>
+            <div style="padding: 20px; border-bottom: 1px solid var(--border); font-weight: 800; font-size: 13px; color: #888;">АКТИВНІ ДІАЛОГИ</div>
+            <div class="chat-list-container" id="support-chat-list" style="flex:1; overflow-y:auto; padding:10px;"></div>
         </aside>
 
         <main class="viewport view-tab active" id="view-support">
-            <div class="v-header">
-                <b id="chat-title">Оберіть чат клієнта</b>
-                <button class="btn btn-outline" style="padding:8px 15px" onclick="closeCurrentChat()">Закрити діалог</button>
+            <div style="padding:15px 25px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center">
+                <b id="active-chat-name" style="font-size:16px">Оберіть чат підтримки</b>
+                <button class="btn-black" style="width:auto; padding:8px 15px; font-size:12px;" onclick="closeSupport()">Архівувати</button>
             </div>
-            <div class="messages-container" id="support-msgs"></div>
-            <form class="sidebar-tools" onsubmit="sendS(event)">
-                <input type="text" id="s-input" class="input-field" placeholder="Напишіть клієнту..." style="border-radius:30px">
-                <button type="submit" class="btn btn-red" style="border-radius:30px">➤</button>
+            <div class="msg-area" id="support-msgs"></div>
+            <form class="control-panel" style="display:flex; gap:10px;" onsubmit="sendSupport(event)">
+                <input type="text" id="support-in" class="input-dark" style="margin:0; border-radius:30px" placeholder="Відповідь клієнту...">
+                <button type="submit" class="btn-black" style="width:50px; height:50px; border-radius:50%; padding:0">➤</button>
             </form>
         </main>
 
         <main class="viewport view-tab" id="view-community" style="display:none">
-            <div class="community-grid">
+            <div class="tool-grid">
                 <div style="display:flex; flex-direction:column; border-right:1px solid var(--border)">
-                    <div class="v-header"><b>Моніторинг Спільноти</b> <button class="btn btn-red" style="padding:5px 12px; font-size:10px" onclick="clearAllComm()">Очистити чат</button></div>
-                    <div class="messages-container" id="comm-msgs"></div>
-                    <form class="sidebar-tools" onsubmit="sendC(event)">
-                        <input type="text" id="c-input" class="input-field" placeholder="Повідомлення від SHOP...">
-                        <button type="submit" class="btn btn-black">ВІДПРАВИТИ</button>
+                    <div style="padding:15px 25px; border-bottom:1px solid var(--border); font-weight:800">МОНІТОРИНГ СПІЛЬНОТИ</div>
+                    <div class="msg-area" id="comm-msgs"></div>
+                    <form class="control-panel" style="display:flex; gap:10px" onsubmit="sendComm(event)">
+                        <input type="text" id="comm-in" class="input-dark" style="margin:0" placeholder="Повідомлення у чат від імені SHOP...">
+                        <button type="submit" class="btn-black" style="width:auto">НАДІСЛАТИ</button>
                     </form>
                 </div>
-                <div style="padding:20px; overflow-y:auto; background:#fcfcfc">
-                    <div class="ad-planner">
-                        <label style="color:var(--accent); font-weight:800; font-size:14px; margin-bottom:15px; display:block">🚀 РОЗШИРЕНА РЕКЛАМА</label>
-                        <div class="input-group">
-                            <label>Текст оголошення</label>
-                            <textarea id="ad-text" class="input-field" style="height:80px" placeholder="Знижка -20% на все!"></textarea>
+                
+                <div style="padding:20px; overflow-y:auto; background:#fdfdfd">
+                    <div class="ad-box">
+                        <label style="color:var(--accent); font-weight:800; font-size:12px; display:block; margin-bottom:15px">📢 КЕРУВАННЯ РЕКЛАМОЮ</label>
+                        <textarea id="ad-text" class="input-dark" placeholder="Текст оголошення..."></textarea>
+                        <input type="text" id="ad-img" class="input-dark" placeholder="URL зображення">
+                        <div style="display:flex; gap:10px">
+                            <input type="number" id="ad-count" class="input-dark" value="1" title="Показів">
+                            <input type="number" id="ad-interval" class="input-dark" value="30" title="Інтервал (хв)">
                         </div>
-                        <div class="input-group">
-                            <label>Посилання на фото</label>
-                            <input type="text" id="ad-img" class="input-field" placeholder="https://...">
-                        </div>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
-                            <div class="input-group">
-                                <label>К-сть показів</label>
-                                <input type="number" id="ad-count" class="input-field" value="1">
-                            </div>
-                            <div class="input-group">
-                                <label>Інтервал (хв)</label>
-                                <input type="number" id="ad-interval" class="input-field" value="30">
-                            </div>
-                        </div>
-                        <button class="btn btn-red" style="width:100%" onclick="startAdCampaign()">ЗАПУСТИТИ КАМПАНІЮ</button>
-                        <div id="ad-status" class="active-ad-banner">Реклама активна: зашилося 3 покази</div>
+                        <button class="btn-black" style="background:var(--accent)" onclick="startAd()">ЗАПУСТИТИ ПУШ</button>
                     </div>
 
-                    <div style="margin-top:30px">
-                        <label style="font-weight:800; font-size:12px; color:#888; display:block; margin-bottom:15px">ЮЗЕРИ В ЧАТІ</label>
-                        <div id="online-users"></div>
+                    <div style="margin-top:25px">
+                        <label style="font-weight:800; font-size:11px; color:#888; display:block; margin-bottom:15px">КОРИСТУВАЧІ В ОНЛАЙНІ</label>
+                        <div id="comm-user-cards"></div>
                     </div>
-                </div>
-            </div>
-        </main>
-
-        <main class="viewport view-tab" id="view-settings" style="display:none; padding:40px">
-            <div style="max-width:600px">
-                <h2>Налаштування CRM</h2>
-                <div class="ad-planner">
-                    <div class="input-group">
-                        <label>Привітання для нових клієнтів</label>
-                        <textarea id="set-welcome" class="input-field">Привіт! Раді вітати в Latiao Snack Club🌶️. Чим можемо допомогти?</textarea>
-                    </div>
-                    <button class="btn btn-red" onclick="saveSets()">Зберегти зміни</button>
                 </div>
             </div>
         </main>
@@ -173,16 +144,14 @@
     </div>
 
 <script>
-    // Firebase Init
+    // --- Firebase Logic ---
     const firebaseConfig = { databaseURL: "https://latiao-chat-default-rtdb.firebaseio.com" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let curChatId = null;
-    let listMode = 'active';
-    let adTimer = null;
+    let curSId = null;
+    let adIntervalId = null;
 
-    // Navigation
     function nav(tab, el) {
         document.querySelectorAll('.view-tab').forEach(v => v.style.display = 'none');
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -191,145 +160,139 @@
         document.getElementById('side-panel').style.display = (tab === 'support') ? 'flex' : 'none';
     }
 
-    function setFilter(m) {
-        listMode = m;
-        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-        document.getElementById(m === 'active' ? 'f-act' : 'f-arc').classList.add('active');
-        loadList();
-    }
-
-    // Support Logic
-    function loadList() {
-        const path = listMode === 'active' ? 'active_chats' : 'closed_chats';
-        db.ref(path).on('value', snap => {
-            const list = document.getElementById('chat-list');
-            list.innerHTML = '';
-            snap.forEach(c => {
-                const div = document.createElement('div');
-                div.className = `chat-card ${curChatId === c.key ? 'active' : ''}`;
-                div.innerHTML = `<strong>👤 ${c.key.substring(0,10)}</strong><small>${c.val().lastMsg || '...'}</small>`;
-                div.onclick = () => selectChat(c.key);
-                list.appendChild(div);
-            });
+    // --- Support logic ---
+    db.ref('active_chats').on('value', snap => {
+        const list = document.getElementById('support-chat-list');
+        list.innerHTML = '';
+        snap.forEach(c => {
+            const div = document.createElement('div');
+            div.style = `padding:15px; border-radius:15px; margin-bottom:8px; cursor:pointer; background:${curSId === c.key ? 'var(--accent-glow)' : '#fff'}; border:1px solid ${curSId === c.key ? 'var(--accent)' : '#eee'}`;
+            div.innerHTML = `<b>👤 ${c.key.substring(1,9)}</b><br><small style="color:#888">${c.val().lastMsg || '...'}</small>`;
+            div.onclick = () => selectS(c.key);
+            list.appendChild(div);
         });
-    }
+    });
 
-    function selectChat(id) {
-        curChatId = id;
-        document.getElementById('chat-title').innerText = "Діалог: " + id;
-        const path = listMode === 'active' ? 'support/' : 'archive/';
-        db.ref(path + id).on('value', snap => {
+    function selectS(id) {
+        curSId = id;
+        document.getElementById('active-chat-name').innerText = "Клієнт: " + id;
+        db.ref('support/' + id).on('value', snap => {
             const area = document.getElementById('support-msgs');
             area.innerHTML = '';
             snap.forEach(m => {
                 const d = m.val();
                 const div = document.createElement('div');
-                div.className = 'msg ' + (d.type === 'admin' ? 'out' : 'in');
+                div.className = `bubble ${d.type === 'admin' ? 'out' : 'in'}`;
                 div.innerText = d.text;
                 area.appendChild(div);
             });
             area.scrollTop = area.scrollHeight;
         });
-        loadList();
     }
 
-    function sendS(e) {
+    function sendSupport(e) {
         e.preventDefault();
-        const input = document.getElementById('s-input');
-        if(!curChatId || !input.value) return;
-        db.ref('support/' + curChatId).push({ text: input.value, type: 'admin', ts: Date.now() });
-        db.ref('active_chats/' + curChatId).update({ lastMsg: "Ви: " + input.value, ts: Date.now() });
+        const input = document.getElementById('support-in');
+        if(!curSId || !input.value) return;
+        db.ref('support/' + curSId).push({ text: input.value, type: 'admin', ts: Date.now() });
+        db.ref('active_chats/' + curSId).update({ lastMsg: "Ви: " + input.value, ts: Date.now() });
         input.value = '';
     }
 
-    // Community Logic
-    db.ref('messages').on('value', snap => {
+    // --- Community logic ---
+    db.ref('messages').limitToLast(40).on('value', snap => {
         const area = document.getElementById('comm-msgs');
         area.innerHTML = '';
         snap.forEach(c => {
             const m = c.val();
             const div = document.createElement('div');
-            div.className = `msg ${m.uid === 'SHOP' ? 'out' : 'in'}`;
+            div.className = `bubble ${m.uid === 'SHOP' ? 'out' : 'in'}`;
             div.style.alignSelf = m.uid === 'SHOP' ? 'flex-end' : 'flex-start';
-            div.innerHTML = `<div class="msg-del" onclick="delM('${c.key}')">✕</div><small style="display:block;font-size:9px;opacity:0.6">${m.name}</small>${m.text}`;
+            div.innerHTML = `<span class="msg-info">${m.name}</span>${m.text}`;
             area.appendChild(div);
         });
         area.scrollTop = area.scrollHeight;
     });
 
     db.ref('presence').on('value', snap => {
-        const list = document.getElementById('online-users');
-        list.innerHTML = '';
+        const container = document.getElementById('comm-user-cards');
+        container.innerHTML = '';
         snap.forEach(c => {
             const u = c.val();
-            const char = u.name ? u.name[0].toUpperCase() : '?';
-            list.innerHTML += `
-                <div class="user-card">
-                    <div class="user-info">
-                        <div class="avatar-circle">${char}</div>
-                        <div><b>${u.name}</b><br><small style="color:var(--success)">online</small></div>
+            const char = (u.name || "?")[0];
+            const card = document.createElement('div');
+            card.className = 'u-card';
+            card.innerHTML = `
+                <div class="u-header">
+                    <div class="u-avatar">${char}</div>
+                    <div class="u-details">
+                        <b>${u.name || "Гість"}</b>
+                        <span>${u.phone ? '✓ Верифікований' : 'Онлайн'}</span>
                     </div>
-                    <div style="display:flex; gap:5px">
-                        <button class="btn btn-outline" style="padding:5px 10px; font-size:10px" onclick="uAct('${c.key}',1)">✉️</button>
-                        <button class="btn btn-outline" style="padding:5px 10px; font-size:10px" onclick="uAct('${c.key}',3)">🚫</button>
-                    </div>
+                </div>
+                <div class="u-actions">
+                    <button class="act-btn private" onclick="uAct('${c.key}', 'msg')" title="Приват">✉️</button>
+                    <button class="act-btn phone" onclick="uAct('${c.key}', 'phone')" title="Запит телефону">📱</button>
+                    <button class="act-btn ban" onclick="uAct('${c.key}', 'ban')" title="Забанити">🚫</button>
                 </div>`;
+            container.appendChild(card);
         });
     });
 
-    // Ad Campaign Logic
-    function startAdCampaign() {
+    function uAct(uid, type) {
+        if(type === 'msg') {
+            const t = prompt("Введіть текст особистого повідомлення:");
+            if(t) db.ref('private_messages/' + uid).push({ text: t, ts: Date.now() });
+        }
+        if(type === 'phone') {
+            if(confirm("Заблокувати чат для юзера до введення телефону?")) {
+                db.ref('presence/' + uid).update({ requirePhone: true, phoneProvided: false });
+            }
+        }
+        if(type === 'ban') {
+            if(confirm("Забанити цього користувача назавжди?")) {
+                db.ref('banned_users/' + uid).set({ ts: Date.now() });
+            }
+        }
+    }
+
+    function sendComm(e) {
+        e.preventDefault();
+        const v = document.getElementById('comm-in').value;
+        if(v) db.ref('messages').push({ uid: 'SHOP', name: 'SHOP ADMIN', text: v, ts: Date.now() });
+        document.getElementById('comm-in').value = '';
+    }
+
+    function startAd() {
         const text = document.getElementById('ad-text').value;
         const img = document.getElementById('ad-img').value;
         const count = parseInt(document.getElementById('ad-count').value);
         const interval = parseInt(document.getElementById('ad-interval').value) * 60000;
+        if(!text) return;
 
-        if(!text) return alert("Введіть текст реклами!");
-        
         let sent = 0;
-        const status = document.getElementById('ad-status');
-        status.style.display = 'block';
-
         const run = () => {
             if(sent < count) {
-                db.ref('messages').push({ uid: 'SHOP', name: '🛍️ Latiao PROMO', text: text, img: img, ts: Date.now() });
+                db.ref('messages').push({ uid: 'SHOP', name: '🛍️ Latiao PROMO', text, img, ts: Date.now() });
                 sent++;
-                status.innerText = `Реклама активна: залишилося ${count - sent} показів`;
-                if(sent < count) adTimer = setTimeout(run, interval);
-                else status.style.display = 'none';
+                if(sent < count) setTimeout(run, interval);
             }
         };
         run();
+        alert("Рекламну кампанію запущено!");
     }
 
-    function sendC(e) {
-        e.preventDefault();
-        const val = document.getElementById('c-input').value;
-        if(val) db.ref('messages').push({ uid: 'SHOP', name: 'ADMIN', text: val, ts: Date.now() });
-        document.getElementById('c-input').value = '';
-    }
-
-    // Actions
-    window.delM = (id) => db.ref('messages/' + id).remove();
-    window.clearAllComm = () => confirm('Очистити чат?') && db.ref('messages').remove();
-    window.uAct = (uid, a) => {
-        if(a === 1) db.ref('private_messages/' + uid).push({ text: prompt("Текст повідомлення:"), ts: Date.now() });
-        if(a === 3) confirm('Забанити?') && db.ref('banned_users/' + uid).set({ ts: Date.now() });
-    };
-
-    function closeCurrentChat() {
-        if(!curChatId) return;
-        db.ref('support/' + curChatId).once('value', snap => {
-            db.ref('archive/' + curChatId).set(snap.val());
-            db.ref('closed_chats/' + curChatId).set({ ts: Date.now(), lastMsg: "Закрито" });
-            db.ref('support/' + curChatId).remove();
-            db.ref('active_chats/' + curChatId).remove();
-            curChatId = null;
+    function closeSupport() {
+        if(!curSId) return;
+        db.ref('support/' + curSId).once('value', snap => {
+            db.ref('archive/' + curSId).set(snap.val());
+            db.ref('closed_chats/' + curSId).set({ ts: Date.now(), lastMsg: "Закрито" });
+            db.ref('support/' + curSId).remove();
+            db.ref('active_chats/' + curSId).remove();
+            curSId = null;
             document.getElementById('support-msgs').innerHTML = '';
         });
     }
-
-    loadList();
 </script>
 </body>
 </html>

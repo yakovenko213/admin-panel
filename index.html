@@ -2,8 +2,8 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Latiao CRM Ultimate 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Latiao CRM Ultra | Mobile Optimized</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -21,107 +21,147 @@
         }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--chrome-bg); color: #1a1a1b; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        html, body { 
+            height: 100%; 
+            width: 100%; 
+            margin: 0; 
+            padding: 0; 
+            overflow: hidden; 
+            position: fixed; /* Запобігає скролу всього екрану на iOS */
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: var(--chrome-bg); 
+            display: flex; 
+            flex-direction: column; 
+        }
 
         /* --- CHROME TABS --- */
-        .chrome-header { display: flex; align-items: flex-end; padding: 8px 8px 0; gap: 4px; background: var(--chrome-bg); border-bottom: 1px solid #c1c3c8; flex-shrink: 0; }
+        .chrome-header { 
+            display: flex; 
+            align-items: flex-end; 
+            padding: 8px 8px 0; 
+            gap: 4px; 
+            background: var(--chrome-bg); 
+            border-bottom: 1px solid #c1c3c8;
+            flex-shrink: 0;
+            padding-top: env(safe-area-inset-top, 8px);
+        }
         .tab {
-            position: relative; padding: 10px 15px; min-width: 60px; height: 38px;
+            position: relative; padding: 10px 12px; min-width: 50px; height: 38px;
             background: transparent; border-radius: 12px 12px 0 0;
-            cursor: pointer; font-size: 13px; font-weight: 600; color: #5f6368;
-            display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
+            cursor: pointer; font-size: 12px; font-weight: 600; color: #5f6368;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
         }
         .tab span { display: none; }
         .tab.active { background: var(--chrome-tab); color: var(--accent); }
-        .tab.active::before { content: ''; position: absolute; bottom: 0; left: -15px; width: 15px; height: 15px; border-bottom-right-radius: 10px; box-shadow: 5px 0 0 0 var(--chrome-tab); }
-        .tab.active::after { content: ''; position: absolute; bottom: 0; right: -15px; width: 15px; height: 15px; border-bottom-left-radius: 10px; box-shadow: -5px 0 0 0 var(--chrome-tab); }
         
-        @media (min-width: 768px) { .tab { min-width: 160px; justify-content: flex-start; } .tab span { display: inline; } }
+        @media (min-width: 768px) { .tab { min-width: 150px; } .tab span { display: inline; } }
 
         /* --- LAYOUT --- */
         .app-shell { flex: 1; display: flex; background: #fff; overflow: hidden; position: relative; }
-        .sidebar { width: 100%; height: 100%; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: absolute; z-index: 10; transition: transform 0.3s ease; }
+
+        /* Sidebar */
+        .sidebar { 
+            width: 100%; height: 100%; background: var(--sidebar-bg); border-right: 1px solid var(--border); 
+            display: flex; flex-direction: column; position: absolute; z-index: 100; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
         .sidebar.hidden { transform: translateX(-100%); }
-        @media (min-width: 992px) { .sidebar { position: relative; width: 350px; transform: none !important; } }
+        @media (min-width: 992px) { .sidebar { position: relative; width: 320px; transform: none !important; } }
 
-        .viewport { flex: 1; display: flex; flex-direction: column; background: #fff; width: 100%; }
+        /* Viewport */
+        .viewport { flex: 1; display: flex; flex-direction: column; background: #fff; height: 100%; }
         
-        /* --- USER CARDS 2.0 --- */
-        .user-mgmt-area { padding: 15px; overflow-y: auto; background: #fdfdfd; }
-        .u-card { 
-            background: #fff; border: 1px solid var(--border); border-radius: 20px; 
-            padding: 16px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            display: flex; flex-direction: column; gap: 12px;
+        .mobile-top-nav {
+            padding: 10px 15px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px; background: #fff;
         }
-        .u-header { display: flex; align-items: center; gap: 12px; }
-        .u-avatar { width: 48px; height: 48px; border-radius: 15px; background: #f0f2f5; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; position: relative; }
-        .u-status-dot { position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; border: 3px solid #fff; border-radius: 50%; }
-        
-        .u-details b { font-size: 15px; display: block; }
-        .u-details span { font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .btn-back { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ddd; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        @media (min-width: 992px) { .btn-back { display: none; } }
 
-        .u-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .u-btn { 
-            border: none; padding: 10px; border-radius: 12px; font-weight: 700; font-size: 11px;
-            cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;
-            background: #f1f3f4; color: #444;
-        }
-        .u-btn:active { transform: scale(0.95); }
-        .u-btn.pri { background: rgba(0, 122, 255, 0.1); color: var(--info); }
-        .u-btn.pho { background: rgba(255, 204, 0, 0.1); color: #b08d00; }
-        .u-btn.ban { background: rgba(230, 33, 23, 0.1); color: var(--accent); }
-
-        /* --- MESSAGES --- */
+        /* Messages */
         .msg-area { flex: 1; padding: 15px; overflow-y: auto; background: #f4f6f8; display: flex; flex-direction: column; gap: 8px; }
-        .bubble { padding: 12px 16px; border-radius: 18px; max-width: 85%; font-size: 14px; line-height: 1.5; }
+        .bubble { padding: 12px 16px; border-radius: 18px; max-width: 85%; font-size: 14px; line-height: 1.4; }
         .bubble.in { align-self: flex-start; background: #fff; border: 1px solid #eee; }
         .bubble.out { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
 
-        .input-form { padding: 12px 15px; border-top: 1px solid var(--border); background: #fff; display: flex; gap: 10px; }
-        .input-form input { flex: 1; padding: 12px 18px; border-radius: 25px; border: 1px solid var(--border); background: #f1f3f4; }
-        .btn-send { background: #000; color: #fff; border: none; min-width: 44px; height: 44px; border-radius: 50%; cursor: pointer; }
+        /* Input Footer - Fixed for Mobile */
+        .footer-form { 
+            padding: 10px 15px; 
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+            background: #fff; 
+            border-top: 1px solid var(--border);
+            display: flex; 
+            gap: 10px;
+            align-items: center;
+        }
+        .footer-form input { 
+            flex: 1; 
+            height: 44px; 
+            padding: 0 18px; 
+            border-radius: 22px; 
+            border: 1px solid var(--border); 
+            background: #f1f3f4; 
+            font-size: 16px; /* Запобігає зуму на iPhone */
+        }
+        .btn-send { width: 44px; height: 44px; border-radius: 50%; border: none; background: #000; color: #fff; cursor: pointer; }
+
+        /* User Cards */
+        .user-mgmt { padding: 15px; overflow-y: auto; background: #f8fafc; }
+        .u-card { background: #fff; border: 1px solid var(--border); border-radius: 20px; padding: 15px; margin-bottom: 12px; }
+        .u-info { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .u-avatar { width: 44px; height: 44px; border-radius: 12px; background: var(--accent-glow); color: var(--accent); font-weight: 800; display: flex; align-items: center; justify-content: center; position: relative; }
+        .u-dot { position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; }
+        .u-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        .u-btn { border: none; padding: 10px; border-radius: 10px; font-size: 16px; cursor: pointer; background: #f1f3f4; }
+
+        .badge { background: var(--accent); color: #fff; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 8px; margin-left: auto; }
     </style>
 </head>
 <body>
 
-    <audio id="snd-tab" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
+    <audio id="snd-click" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
 
     <header class="chrome-header">
-        <div class="tab active" onclick="nav('support', this)"><i>💬</i> <span>Підтримка</span></div>
+        <div class="tab active" onclick="nav('support', this)"><i>💬</i> <span>Підтримка</span> <div class="badge" id="b-act">0</div></div>
         <div class="tab" onclick="nav('community', this)"><i>🌶️</i> <span>Спільнота</span></div>
         <div class="tab" onclick="nav('settings', this)"><i>⚙️</i> <span>Налаштування</span></div>
     </header>
 
     <div class="app-shell">
         <aside class="sidebar" id="side-panel">
-            <div style="padding:15px; border-bottom:1px solid var(--border); font-weight:800; font-size:12px; color:#888;">АКТИВНІ ЧАТИ</div>
-            <div class="chat-list" id="chat-list" style="overflow-y:auto; flex:1; padding:10px;"></div>
+            <div style="padding:15px; border-bottom:1px solid var(--border); font-weight:800; font-size:11px; color:#888;">АКТИВНІ ДІАЛОГИ</div>
+            <div id="chat-list" style="flex:1; overflow-y:auto; padding:10px;"></div>
         </aside>
 
         <main class="viewport view-tab active" id="view-support">
-            <div style="padding:10px 15px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px">
-                <button onclick="document.getElementById('side-panel').classList.remove('hidden')" style="padding:5px 10px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer">‹ Назад</button>
-                <b id="chat-title" style="font-size:14px">Оберіть чат</b>
+            <div class="mobile-top-nav">
+                <button class="btn-back" onclick="document.getElementById('side-panel').classList.remove('hidden')">‹</button>
+                <b id="active-name" style="font-size:14px">Оберіть чат</b>
+                <button style="margin-left:auto; border:none; background:none; color:var(--accent); font-weight:700;" onclick="archiveChat()">Закрити</button>
             </div>
             <div class="msg-area" id="support-msgs"></div>
-            <form class="input-form" onsubmit="sendS(event)">
-                <input type="text" id="s-input" placeholder="Відповідь..." autocomplete="off">
+            <form class="footer-form" onsubmit="sendS(event)">
+                <input type="text" id="s-input" placeholder="Ваша відповідь..." autocomplete="off">
                 <button type="submit" class="btn-send">➤</button>
             </form>
         </main>
 
-        <main class="viewport view-tab" id="view-community" style="display:none; flex-direction:row">
-            <div style="flex:1; display:flex; flex-direction:column; border-right:1px solid var(--border)">
-                <div style="padding:15px; border-bottom:1px solid var(--border); font-weight:800">ЧАТ СПІЛЬНОТИ</div>
+        <main class="viewport view-tab" id="view-community" style="display:none; flex-direction:row; flex-wrap: wrap;">
+            <div style="flex:2; min-width:320px; display:flex; flex-direction:column; border-right:1px solid var(--border); height:100%">
+                <div class="mobile-top-nav"><b>Чат Клубу</b></div>
                 <div class="msg-area" id="comm-msgs"></div>
-                <form class="input-form" onsubmit="sendC(event)">
-                    <input type="text" id="c-input" placeholder="Від SHOP...">
+                <form class="footer-form" onsubmit="sendC(event)">
+                    <input type="text" id="c-input" placeholder="Від імені SHOP...">
                     <button type="submit" class="btn-send">➤</button>
                 </form>
             </div>
-            <div class="user-mgmt-area" style="width:350px;">
-                <h4 style="margin:0 0 15px 0; font-size:12px; color:#888;">УПРАВЛІННЯ КОРИСТУВАЧАМИ</h4>
-                <div id="user-cards-container"></div>
+            <div class="user-mgmt" style="flex:1; min-width:320px; height:100%">
+                <h4 style="font-size:11px; color:#888; margin:0 0 15px 0;">УПРАВЛІННЯ КЛУБОМ</h4>
+                <div id="u-cards"></div>
             </div>
         </main>
     </div>
@@ -131,13 +171,10 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    function playTab() { 
-        const s = document.getElementById('snd-tab');
-        s.currentTime = 0; s.volume = 0.2; s.play().catch(()=>{}); 
-    }
+    function playSnd() { const s = document.getElementById('snd-click'); s.currentTime=0; s.volume=0.2; s.play().catch(()=>{}); }
 
     function nav(tab, el) {
-        playTab();
+        playSnd();
         document.querySelectorAll('.view-tab').forEach(v => v.style.display = 'none');
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.getElementById('view-' + tab).style.display = 'flex';
@@ -149,23 +186,24 @@
 
     db.ref('active_chats').on('value', snap => {
         const list = document.getElementById('chat-list'); list.innerHTML = '';
+        document.getElementById('b-act').innerText = snap.numChildren();
         snap.forEach(c => {
             const div = document.createElement('div');
-            div.style = `padding:12px; border-radius:12px; margin-bottom:8px; cursor:pointer; background:${curId === c.key ? 'var(--accent-glow)' : '#fff'}; border:1px solid ${curId === c.key ? 'var(--accent)' : '#eee'}`;
-            div.innerHTML = `<strong>${c.key.substring(1,9)}</strong><br><small style="color:#888">${c.val().lastMsg || '...'}</small>`;
-            div.onclick = () => { curId = c.key; selectS(c.key); if(window.innerWidth<992) document.getElementById('side-panel').classList.add('hidden'); };
+            div.style = `padding:12px; border-radius:14px; margin-bottom:8px; cursor:pointer; background:${curId===c.key?'var(--accent-glow)':'#fff'}; border:1px solid ${curId===c.key?'var(--accent)':'#eee'}`;
+            div.innerHTML = `<strong>${c.key.substring(1,9)}</strong><br><small style="color:#888">${c.val().lastMsg||'...'}</small>`;
+            div.onclick = () => { curId=c.key; selectS(c.key); if(window.innerWidth<992) document.getElementById('side-panel').classList.add('hidden'); };
             list.appendChild(div);
         });
     });
 
     function selectS(id) {
-        document.getElementById('chat-title').innerText = "Чат: " + id.substring(1,9);
+        document.getElementById('active-name').innerText = "Клієнт: " + id.substring(1,9);
         db.ref('support/' + id).on('value', snap => {
             const area = document.getElementById('support-msgs'); area.innerHTML = '';
             snap.forEach(m => {
                 const d = m.val();
                 const div = document.createElement('div');
-                div.className = `bubble ${d.type === 'admin' ? 'out' : 'in'}`;
+                div.className = `bubble ${d.type==='admin'?'out':'in'}`;
                 div.innerText = d.text;
                 area.appendChild(div);
             });
@@ -174,50 +212,41 @@
     }
 
     function sendS(e) {
-        e.preventDefault();
-        const i = document.getElementById('s-input');
+        e.preventDefault(); const i = document.getElementById('s-input');
         if(!curId || !i.value) return;
         db.ref('support/'+curId).push({text: i.value, type: 'admin', ts: Date.now()});
         db.ref('active_chats/'+curId).update({lastMsg: "Ви: "+i.value});
         i.value = '';
     }
 
-    // Community Users Logic
     db.ref('presence').on('value', snap => {
-        const container = document.getElementById('user-cards-container');
-        container.innerHTML = '';
+        const container = document.getElementById('u-cards'); container.innerHTML = '';
         snap.forEach(c => {
-            const u = childVal = c.val();
-            const uid = c.key;
-            const statusColor = u.phone ? 'var(--success)' : (u.requirePhone ? 'var(--warning)' : '#ccc');
-            const statusText = u.phone ? 'Верифікований' : (u.requirePhone ? 'Очікує №' : 'Гість');
-            
+            const u = c.val();
+            const color = u.phone ? 'var(--success)' : (u.requirePhone ? 'var(--warning)' : '#ccc');
             const card = document.createElement('div');
             card.className = 'u-card';
             card.innerHTML = `
-                <div class="u-header">
-                    <div class="u-avatar">${(u.name||'?')[0]}<div class="u-status-dot" style="background:${statusColor}"></div></div>
-                    <div class="u-details"><b>${u.name || "Гість"}</b><span style="color:${statusColor}">${statusText}</span></div>
+                <div class="u-info">
+                    <div class="u-avatar">${(u.name||'?')[0]}<div class="u-dot" style="background:${color}"></div></div>
+                    <div><b>${u.name||'Гість'}</b><br><small style="font-size:10px; color:#888">${u.phone||'Немає номера'}</small></div>
                 </div>
                 <div class="u-actions">
-                    <button class="u-btn pri" onclick="uAct('${uid}', 'msg')">✉️ Приват</button>
-                    <button class="u-btn pho" onclick="uAct('${uid}', 'phone')">📱 Запит №</button>
-                    <button class="u-btn ban" onclick="uAct('${uid}', 'ban')">🚫 Бан</button>
+                    <button class="u-btn" onclick="uAct('${c.key}','msg')">✉️</button>
+                    <button class="u-btn" onclick="uAct('${c.key}','phone')">📱</button>
+                    <button class="u-btn" onclick="uAct('${c.key}','ban')">🚫</button>
                 </div>`;
             container.appendChild(card);
         });
     });
 
-    window.uAct = (uid, type) => {
-        if(type === 'msg') {
-            const t = prompt("Приватне повідомлення:");
-            if(t) db.ref('private_messages/'+uid).push({text: t, ts: Date.now()});
-        }
-        if(type === 'phone') db.ref('presence/'+uid).update({requirePhone: true, phoneProvided: false});
-        if(type === 'ban') if(confirm("Забанити?")) db.ref('banned_users/'+uid).set({ts: Date.now()});
-    };
+    function uAct(uid, t) {
+        if(t==='msg') { const m=prompt("Текст:"); if(m) db.ref('private_messages/'+uid).push({text:m, ts:Date.now()}); }
+        if(t==='phone') db.ref('presence/'+uid).update({requirePhone:true, phoneProvided:false});
+        if(t==='ban') if(confirm("Бан?")) db.ref('banned_users/'+uid).set({ts:Date.now()});
+    }
 
-    function sendC(e) { e.preventDefault(); const i = document.getElementById('c-input'); if(i.value) db.ref('messages').push({uid:'SHOP', name:'ADMIN', text:i.value, ts:Date.now()}); i.value=''; }
+    function sendC(e) { e.preventDefault(); const i=document.getElementById('c-input'); if(i.value) db.ref('messages').push({uid:'SHOP', name:'ADMIN', text:i.value, ts:Date.now()}); i.value=''; }
     db.ref('messages').limitToLast(20).on('value', snap => {
         const area = document.getElementById('comm-msgs'); area.innerHTML = '';
         snap.forEach(c => {
@@ -230,6 +259,18 @@
         });
         area.scrollTop = area.scrollHeight;
     });
+
+    function archiveChat() {
+        if(!curId) return;
+        db.ref('support/'+curId).once('value', snap => {
+            db.ref('archive/'+curId).set(snap.val());
+            db.ref('closed_chats/'+curId).set({ts: Date.now(), lastMsg: "Закрито"});
+            db.ref('support/'+curId).remove();
+            db.ref('active_chats/'+curId).remove();
+            curId = null; document.getElementById('support-msgs').innerHTML = '';
+            document.getElementById('side-panel').classList.remove('hidden');
+        });
+    }
 </script>
 </body>
 </html>

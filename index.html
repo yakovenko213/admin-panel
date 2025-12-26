@@ -11,47 +11,49 @@
         :root { --primary: #e62117; --bg: #f8f9fa; --sidebar: #ffffff; --border: #e4e6eb; --keycrm: #3e5266; }
         body { font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
         
-        /* Ліва панель навігації та списку чатів */
+        /* Sidebar */
         .sidebar { width: 320px; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
         .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); text-align: center; color: var(--primary); }
         .nav-menu { padding: 10px; }
-        .nav-link { padding: 12px 15px; cursor: pointer; border-radius: 8px; border: none; background: none; text-align: left; font-weight: 600; width: 100%; color: #65676b; margin-bottom: 5px; }
+        .nav-link { padding: 12px 15px; cursor: pointer; border-radius: 8px; border: none; background: none; text-align: left; font-weight: 600; width: 100%; color: #65676b; margin-bottom: 5px; transition: 0.2s; }
         .nav-link.active { background: #fff1f0; color: var(--primary); }
+        .nav-link:hover:not(.active) { background: #f2f2f2; }
         
         .chat-filters { display: flex; border-bottom: 1px solid var(--border); background: #fafafa; }
         .filter-btn { flex: 1; padding: 10px; border: none; background: none; font-size: 11px; font-weight: 700; cursor: pointer; color: #888; text-transform: uppercase; }
         .filter-btn.active { color: var(--primary); border-bottom: 2px solid var(--primary); background: #fff; }
         
         .chat-scroll { flex: 1; overflow-y: auto; }
-        .chat-card { padding: 15px; border-bottom: 1px solid #f0f2f5; cursor: pointer; position: relative; }
-        .chat-card.active { background: #fef2f2; border-left: 4px solid var(--primary); }
+        .chat-card { padding: 15px; border-bottom: 1px solid #f0f2f5; cursor: pointer; border-left: 4px solid transparent; }
+        .chat-card.active { background: #fef2f2; border-left-color: var(--primary); }
         .chat-card strong { font-size: 13px; color: #333; }
         .chat-card small { color: #888; font-size: 11px; display: block; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Основна робоча область */
+        /* Main */
         .main { flex: 1; display: flex; flex-direction: column; background: #fff; }
         .tab-content { display: none; flex: 1; overflow: hidden; flex-direction: column; }
         .tab-content.active { display: flex; }
 
-        /* Повідомлення */
+        /* Messages */
         .msg-area { flex: 1; padding: 20px; overflow-y: auto; background: #f0f2f5; display: flex; flex-direction: column; gap: 10px; }
         .scm { padding: 10px 14px; border-radius: 18px; max-width: 70%; font-size: 14px; line-height: 1.4; position: relative; }
         .scm span { display: block; font-size: 9px; margin-top: 4px; opacity: 0.6; text-align: right; }
         .scm.user { align-self: flex-start; background: #fff; border: 1px solid #ddd; }
         .scm.admin { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 2px; }
 
-        /* Інструменти KeyCRM та дії */
+        /* Controls */
         .chat-controls { padding: 12px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: center; background: #fff; }
         .btn-action { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); background: #fff; font-size: 12px; cursor: pointer; font-weight: 600; }
         .btn-key { background: var(--keycrm); color: #fff; border: none; display: none; }
-        .btn-key:hover { background: #2c3e50; }
 
-        #keycrm-res { background: #fdfdfd; padding: 15px; border-bottom: 1px solid #eee; display: none; max-height: 150px; overflow-y: auto; }
-        .order-item { background: #fff; border: 1px solid #ddd; padding: 10px; border-radius: 8px; display: inline-block; margin-right: 10px; font-size: 11px; min-width: 150px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        /* KeyCRM Results Layout */
+        #keycrm-res { background: #f4f6f8; padding: 15px; border-bottom: 1px solid #ddd; display: none; max-height: 200px; overflow-y: auto; }
+        .order-item { background: #fff; border: 1px solid #ddd; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .order-badge { background: #e1f5fe; color: #01579b; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
 
-        /* Статистика та Контакти */
+        /* Stats & Contacts */
         .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; padding: 20px; }
-        .stat-box { background: #fff; border: 1px solid #eee; padding: 20px; border-radius: 15px; text-align: center; }
+        .stat-box { background: #fff; border: 1px solid #eee; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
         .stat-box p { font-size: 26px; font-weight: 800; color: var(--primary); margin: 5px 0; }
         
         .data-table { width: 100%; border-collapse: collapse; background: #fff; }
@@ -85,34 +87,33 @@
             <div id="keycrm-res"></div>
             <div id="msg-area" class="msg-area"></div>
             <form style="padding: 15px; display: flex; gap: 10px; border-top: 1px solid #eee;" onsubmit="sendReply(event)">
-                <input type="text" id="admin-reply" style="flex:1; padding: 12px 20px; border-radius: 25px; border: 1px solid #ddd; outline: none; font-size: 14px;" placeholder="Введіть повідомлення..." autocomplete="off">
-                <button type="submit" style="background:var(--primary); color:#fff; border:none; width: 45px; height: 45px; border-radius:50%; cursor:pointer; font-weight:bold;">➤</button>
+                <input type="text" id="admin-reply" style="flex:1; padding: 12px 20px; border-radius: 25px; border: 1px solid #ddd; outline: none;" placeholder="Введіть повідомлення..." autocomplete="off">
+                <button type="submit" style="background:var(--primary); color:#fff; border:none; width: 45px; height: 45px; border-radius:50%; cursor:pointer;">➤</button>
             </form>
         </section>
 
         <section id="tab-stats" class="tab-content" style="padding: 20px; overflow-y: auto;">
-            <h2>Статистика чату</h2>
+            <h2>Аналітика роботи</h2>
             <div class="stat-grid">
-                <div class="stat-box"><h4>Активні діалоги</h4><p id="st-total">0</p></div>
-                <div class="stat-box"><h4>Вхолосту (Ghost)</h4><p id="st-ghost">0</p></div>
-                <div class="stat-box"><h4>Середня оцінка</h4><p id="st-rate">0.0</p></div>
-                <div class="stat-box"><h4>Зібрано номерів</h4><p id="st-contacts">0</p></div>
+                <div class="stat-box"><h4>Діалоги</h4><p id="st-total">0</p></div>
+                <div class="stat-box"><h4>Вхолосту</h4><p id="st-ghost">0</p></div>
+                <div class="stat-box"><h4>Рейтинг</h4><p id="st-rate">0.0</p></div>
+                <div class="stat-box"><h4>Контакти</h4><p id="st-contacts">0</p></div>
             </div>
-            <div id="ratings-log" style="margin-top: 25px;"></div>
         </section>
 
         <section id="tab-contacts" class="tab-content" style="padding: 20px; overflow-y: auto;">
-            <h2>База телефонів та UTM</h2>
+            <h2>База клієнтів</h2>
             <table class="data-table">
-                <thead><tr><th>ID Клієнта</th><th>Телефон</th><th>UTM / Джерело</th><th>Дата</th></tr></thead>
+                <thead><tr><th>ID</th><th>Телефон</th><th>Джерело</th><th>Дата</th></tr></thead>
                 <tbody id="contacts-body"></tbody>
             </table>
         </section>
     </main>
 
 <script>
-    // ПІДКЛЮЧЕННЯ ВАШОГО GOOGLE SCRIPT
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwxM9HdEcyq6MVoXwrUA_fhrDzM81OTiFy-MP-Xm2uO6tLYKOl8EW3QXcQ91VKhJWdiSQ/exec";
+    // ПОСИЛАННЯ НА ВАШ ДОДАТОК (GOOGLE SCRIPT)
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxAA0ivXrsxgq73yDWF4omkw5ENQIIKrmCzenYT9ZECiP0SnioZhJzXyFkWt3eSPQUAw/exec";
     
     const firebaseConfig = { databaseURL: "https://latiao-chat-default-rtdb.firebaseio.com" };
     firebase.initializeApp(firebaseConfig);
@@ -145,8 +146,8 @@
             container.innerHTML = '';
             snap.forEach(child => {
                 const div = document.createElement('div');
-                div.className = `chat-item chat-card ${currentId === child.key ? 'active' : ''}`;
-                div.innerHTML = `<strong>ID: ${child.key.substring(1, 10)}</strong><br><small>${child.val().lastMsg || '...'}</small>`;
+                div.className = `chat-card ${currentId === child.key ? 'active' : ''}`;
+                div.innerHTML = `<strong>ID: ${child.key.substring(0, 10)}</strong><br><small>${child.val().lastMsg || '...'}</small>`;
                 div.onclick = () => selectChat(child.key);
                 container.appendChild(div);
             });
@@ -158,7 +159,6 @@
         loadChats();
         document.getElementById('keycrm-res').style.display = 'none';
         
-        // Перевірка наявності телефону
         db.ref('contacts/' + id).once('value', s => {
             currentPhone = s.exists() ? s.val().phone : null;
             document.getElementById('key-btn').style.display = currentPhone ? 'block' : 'none';
@@ -180,39 +180,48 @@
         });
     }
 
-    // ПОШУК ЗАМОВЛЕНЬ ЧЕРЕЗ GOOGLE SCRIPT (KEYCRM)
+    // ФУНКЦІЯ ПОШУКУ В KEYCRM
     async function checkKeyCRM() {
         const resBox = document.getElementById('keycrm-res');
-        resBox.innerHTML = "⌛ Шукаємо замовлення в KeyCRM...";
+        resBox.innerHTML = "⌛ Отримання даних з KeyCRM...";
         resBox.style.display = 'block';
         
         try {
             const cleanPhone = currentPhone.replace(/\D/g, '');
-            const response = await fetch(`${GOOGLE_SCRIPT_URL}?phone=${cleanPhone}`);
+            const response = await fetch(`${GOOGLE_SCRIPT_URL}?phone=${cleanPhone}`, { redirect: 'follow' });
             const data = await response.json();
             
-            if(data.data && data.data.length > 0) {
+            if (data.data && data.data.length > 0) {
                 resBox.innerHTML = '';
                 data.data.forEach(order => {
+                    const productName = order.products && order.products.length > 0 ? order.products[0].name : "Без назви";
+                    const ttn = order.shipping && order.shipping.tracking_code ? order.shipping.tracking_code : "Немає ТТН";
+                    const status = order.status ? order.status.name : "Новий";
+                    
                     resBox.innerHTML += `
                         <div class="order-item">
-                            <b>№${order.id}</b><br>
-                            Статус: <b>${order.status?.name || 'Новий'}</b><br>
-                            Сума: ${order.grand_total} ${order.currency_code}
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                <b>Замовлення №${order.id}</b>
+                                <span class="order-badge">${status}</span>
+                            </div>
+                            <div style="margin-bottom:5px;">📦 ${productName}</div>
+                            <div style="font-size:11px; color:#555;">
+                                Сума: <b>${order.grand_total} грн</b> | ТТН: <code>${ttn}</code>
+                            </div>
                         </div>`;
                 });
             } else { 
                 resBox.innerHTML = `❌ Замовлень для номера ${cleanPhone} не знайдено.`; 
             }
         } catch (e) { 
-            resBox.innerHTML = "⚠️ Помилка з'єднання з KeyCRM через Google Script."; 
+            resBox.innerHTML = "⚠️ Помилка з'єднання з додатком Google Script."; 
         }
     }
 
     function sendReply(e) {
         e.preventDefault();
         const input = document.getElementById('admin-reply');
-        if(!currentId || !input.value.trim() || listFilter === 'closed') return;
+        if(!currentId || !input.value.trim()) return;
         const text = input.value;
         const ts = Date.now();
         db.ref('support/' + currentId).push({ text, type: 'admin', ts });
@@ -221,11 +230,11 @@
     }
 
     function closeChat() {
-        if(!currentId || listFilter === 'closed') return;
+        if(!currentId) return;
         if(confirm('Перенести діалог в архів?')) {
             db.ref('support/' + currentId).once('value', snap => {
                 db.ref('archive/' + currentId).set(snap.val());
-                db.ref('closed_chats/' + currentId).set({ ts: Date.now(), lastMsg: "Діалог архівовано" });
+                db.ref('closed_chats/' + currentId).set({ ts: Date.now(), lastMsg: "Архівовано" });
                 db.ref('support/' + currentId).remove();
                 db.ref('active_chats/' + currentId).remove();
                 currentId = null;
@@ -237,7 +246,7 @@
 
     function requestPhone() {
         if(!currentId) return;
-        const text = "Будь ласка, напишіть ваш номер телефону для уточнення деталей замовлення:";
+        const text = "Будь ласка, напишіть ваш номер телефону для замовлення:";
         db.ref('support/' + currentId).push({ text, type: 'admin', ts: Date.now() });
     }
 
@@ -245,11 +254,6 @@
         db.ref('stats/ghost_opens').once('value', s => document.getElementById('st-ghost').innerText = s.val() || 0);
         db.ref('active_chats').once('value', s => document.getElementById('st-total').innerText = s.numChildren());
         db.ref('contacts').once('value', s => document.getElementById('st-contacts').innerText = s.numChildren());
-        db.ref('ratings').once('value', snap => {
-            let sum = 0, count = 0;
-            snap.forEach(r => { sum += parseInt(r.val().stars); count++; });
-            document.getElementById('st-rate').innerText = count > 0 ? (sum/count).toFixed(1) : "0.0";
-        });
     }
 
     function loadContacts() {
@@ -258,7 +262,7 @@
             body.innerHTML = '';
             snap.forEach(c => {
                 const d = c.val();
-                body.innerHTML += `<tr><td>${c.key.substring(0,10)}</td><td><b>${d.phone}</b></td><td>${d.utm || 'Direct'}</td><td>${new Date(d.ts).toLocaleDateString()}</td></tr>`;
+                body.innerHTML += `<tr><td>${c.key.substring(0,8)}</td><td><b>${d.phone}</b></td><td>${d.utm || 'Direct'}</td><td>${new Date(d.ts).toLocaleDateString()}</td></tr>`;
             });
         });
     }

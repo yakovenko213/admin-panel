@@ -3,152 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Latiao CRM PRO | Deluxe Edition ❄️</title>
+    <title>Latiao CRM | Ultra Glass ❄️</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { 
             --accent: #e62117; 
-            --accent-glow: rgba(230, 33, 23, 0.08); 
-            --chrome-bg: #dfe1e5; 
-            --chrome-tab: #ffffff; 
-            --sidebar-bg: #f8f9fa; 
-            --border: #e8eaed; 
-            --gold: #ffd700;
-            --glass: rgba(255, 255, 255, 0.8);
+            --accent-gradient: linear-gradient(135deg, #ff4b42 0%, #e62117 100%);
+            --glass: rgba(255, 255, 255, 0.7);
+            --bg: #f0f2f5;
+            --card-shadow: 0 8px 32px rgba(0,0,0,0.08);
         }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; position: fixed; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--chrome-bg); display: flex; flex-direction: column; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: #e2e4e9; height: 100vh; overflow: hidden; }
 
-        /* ANIMATIONS */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideIn { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        /* --- СНІГ --- */
+        .snowflake { position: fixed; top: -10%; z-index: 9999; color: #fff; pointer-events: none; animation: snow-fall 10s linear infinite; }
         @keyframes snow-fall { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(110vh); opacity: 0; } }
 
-        .snowflake { position: fixed; top: -10%; z-index: 9999; color: #fff; font-size: 1em; pointer-events: none; animation: snow-fall 10s linear infinite; }
+        /* --- AUTH --- */
+        #auth-screen { position: fixed; inset: 0; background: url('https://images.unsplash.com/photo-148337517319d-78344b75784b?q=80&w=1470&auto=format&fit=crop'); background-size: cover; z-index: 999999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .auth-card { width: 340px; background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); padding: 40px; border-radius: 40px; text-align: center; box-shadow: var(--card-shadow); border: 1px solid rgba(255,255,255,0.4); }
 
-        /* AUTH SCREEN */
-        #auth-screen { position: fixed; inset: 0; background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1543589077-47d81606c1bf?q=80&w=1470&auto=format&fit=crop'); background-size: cover; z-index: 999999; display: flex; align-items: center; justify-content: center; }
-        .auth-card { width: 360px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 40px; border-radius: 30px; text-align: center; border: 2px solid var(--gold); animation: fadeIn 0.5s ease; }
-        .auth-input { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 15px; border: 1px solid #ddd; transition: 0.3s; }
-        .auth-input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
-        .auth-btn { width: 100%; padding: 15px; background: var(--accent); color: #fff; border: none; border-radius: 15px; font-weight: 800; cursor: pointer; transition: 0.2s; }
-        .auth-btn:active { transform: scale(0.96); }
-
-        /* UI */
-        #crm-ui { display: none; height: 100%; flex-direction: column; }
-        .chrome-header { display: flex; align-items: flex-end; padding: 8px 8px 0; background: var(--chrome-bg); border-bottom: 1px solid #c1c3c8; gap: 4px; flex-shrink: 0; }
-        .tab { padding: 10px 20px; min-width: 140px; height: 38px; border-radius: 12px 12px 0 0; cursor: pointer; font-size: 13px; font-weight: 600; color: #555; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
-        .tab.active { background: #fff; color: var(--accent); box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
-
-        .app-shell { flex: 1; display: flex; background: #fff; overflow: hidden; }
-        .sidebar { width: 340px; border-right: 1px solid var(--border); background: var(--sidebar-bg); display: flex; flex-direction: column; }
-        
-        .chat-item { 
-            padding: 15px; border-radius: 20px; margin: 8px; background: #fff; border: 1px solid #eee; 
-            cursor: pointer; position: relative; transition: 0.3s; animation: slideIn 0.3s ease forwards;
+        /* --- UI COMPONENTS --- */
+        .glass-btn { 
+            background: var(--accent-gradient); color: #fff; border: none; padding: 12px 24px; 
+            border-radius: 18px; font-weight: 700; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(230,33,23,0.3); display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .chat-item:hover { transform: translateX(5px); border-color: var(--accent); }
-        .chat-item.active-chat { background: var(--accent-glow); border-color: var(--accent); }
-        .tag-mgr { position: absolute; right: 12px; top: 12px; font-size: 9px; padding: 3px 8px; border-radius: 6px; background: #007aff; color: #fff; font-weight: 800; }
+        .glass-btn:active { transform: scale(0.92); filter: brightness(1.1); }
 
-        /* MESSAGES */
-        .viewport { flex: 1; display: flex; flex-direction: column; background: #fff; }
-        .msg-area { flex: 1; padding: 20px; overflow-y: auto; background: #f0f2f5; display: flex; flex-direction: column; gap: 10px; }
-        .bubble { padding: 12px 18px; border-radius: 22px; max-width: 75%; font-size: 14px; animation: fadeIn 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .bubble.in { align-self: flex-start; background: #fff; border-bottom-left-radius: 4px; }
-        .bubble.out { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
-        .bubble.sys { align-self: center; background: #cbd5e1; font-size: 10px; font-weight: 800; padding: 5px 15px; }
+        .input-premium {
+            background: rgba(255,255,255,0.5); border: 1px solid rgba(0,0,0,0.05); padding: 14px 20px;
+            border-radius: 20px; font-size: 15px; transition: 0.3s; width: 100%;
+        }
+        .input-premium:focus { background: #fff; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(230,33,23,0.1); }
 
-        .scripts-bar { display: flex; gap: 8px; overflow-x: auto; padding: 12px; border-top: 1px solid #eee; scrollbar-width: none; }
-        .script-btn { flex-shrink: 0; padding: 8px 16px; background: #fff; border: 1px solid #ddd; border-radius: 12px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        .script-btn:active { transform: scale(0.9); background: #eee; }
+        /* --- MAIN LAYOUT --- */
+        #crm-ui { display: none; height: 100vh; flex-direction: column; }
+        .nav-bar { 
+            display: flex; padding: 10px 20px; background: rgba(255,255,255,0.6); 
+            backdrop-filter: blur(15px); border-bottom: 1px solid rgba(0,0,0,0.05); gap: 10px; z-index: 10;
+        }
+        .nav-tab { 
+            padding: 10px 20px; border-radius: 15px; font-size: 14px; font-weight: 700; color: #555; 
+            cursor: pointer; transition: 0.3s; 
+        }
+        .nav-tab.active { background: #fff; color: var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 
-        .footer { padding: 15px; display: flex; gap: 12px; border-top: 1px solid #eee; }
-        .footer input { flex: 1; padding: 14px 20px; border-radius: 25px; border: 1px solid #eee; background: #f5f5f5; font-size: 15px; transition: 0.3s; }
-        .footer input:focus { background: #fff; border-color: var(--accent); }
+        .app-main { flex: 1; display: flex; overflow: hidden; }
+        .side-panel { 
+            width: 350px; background: rgba(255,255,255,0.4); border-right: 1px solid rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-        .set-card { background: #fff; padding: 25px; border-radius: 25px; border: 1px solid #eee; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        /* --- CHAT ITEMS --- */
+        .chat-row { 
+            margin: 10px 15px; padding: 15px; background: #fff; border-radius: 22px; 
+            cursor: pointer; transition: 0.3s; border: 1px solid transparent; position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .chat-row:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.05); }
+        .chat-row.selected { border-color: var(--accent); background: #fff1f0; }
+        
+        /* Кнопка призначення */
+        .assign-trigger { 
+            position: absolute; right: 12px; top: 12px; width: 32px; height: 32px; 
+            border-radius: 10px; background: #f0f2f5; display: flex; align-items: center; justify-content: center;
+            font-size: 14px; transition: 0.2s; border: none; cursor: pointer;
+        }
+        .assign-trigger:hover { background: #007aff; color: #fff; }
 
-        /* MOBILE ADAPTIVITY */
+        /* --- CHAT AREA --- */
+        .chat-viewport { flex: 1; display: flex; flex-direction: column; background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-attachment: fixed; }
+        .messages-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        
+        .msg { padding: 12px 18px; border-radius: 20px; max-width: 75%; font-size: 14px; line-height: 1.5; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .msg.in { align-self: flex-start; background: #fff; border-bottom-left-radius: 4px; color: #1a1a1a; }
+        .msg.out { align-self: flex-end; background: var(--accent-gradient); color: #fff; border-bottom-right-radius: 4px; }
+        .msg.sys { align-self: center; background: rgba(0,0,0,0.05); font-size: 11px; font-weight: 800; color: #666; padding: 6px 15px; border-radius: 12px; }
+
+        .chat-footer { padding: 20px; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); display: flex; gap: 12px; align-items: center; }
+
+        /* --- MODAL --- */
+        #modal-overlay { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); 
+            z-index: 10000; display: none; align-items: center; justify-content: center; 
+        }
+        .modal-card { width: 300px; background: #fff; border-radius: 30px; padding: 25px; box-shadow: var(--card-shadow); }
+        .mgr-option { padding: 12px; border-radius: 15px; margin-bottom: 8px; cursor: pointer; border: 1px solid #eee; font-weight: 600; text-align: center; }
+        .mgr-option:hover { background: var(--accent); color: #fff; }
+
         @media (max-width: 992px) {
-            .sidebar { width: 100%; position: absolute; inset: 0; z-index: 100; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-            .sidebar.hidden { transform: translateX(-100%); }
+            .side-panel { position: absolute; inset: 0; z-index: 100; width: 100%; }
+            .side-panel.hidden { transform: translateX(-100%); }
         }
     </style>
 </head>
-<body onclick="playClick()">
+<body onclick="initAudio()">
 
-    <audio id="snd-click" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
-    <audio id="snd-send" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3" preload="auto"></audio>
-
-    <div id="snow-container"></div>
+    <div id="snow-box"></div>
 
     <div id="auth-screen">
         <div class="auth-card">
-            <h2 style="color:var(--accent); margin:0 0 10px 0;">Latiao CRM</h2>
-            <p style="font-size:13px; color:#666; margin-bottom:30px;">Зимовий сезон 2026 ❄️</p>
-            <input type="text" id="auth-l" class="auth-input" placeholder="Логін">
-            <input type="password" id="auth-p" class="auth-input" placeholder="Пароль">
-            <button class="auth-btn" onclick="tryLogin()">УВІЙТИ В СИСТЕМУ</button>
+            <h1 style="color:var(--accent); font-size: 28px; margin:0 0 10px;">🌶️ Latiao CRM</h1>
+            <p style="font-size:13px; color:#666; margin-bottom:30px;">Winter Security Login</p>
+            <input type="text" id="al" class="input-premium" placeholder="Логін" style="margin-bottom:12px">
+            <input type="password" id="ap" class="input-premium" placeholder="Пароль" style="margin-bottom:20px">
+            <button class="glass-btn" style="width:100%" onclick="login()">УВІЙТИ</button>
         </div>
     </div>
 
     <div id="crm-ui">
-        <header class="chrome-header">
-            <div class="tab active" onclick="nav('support', this)"><span>💬 Підтримка</span> <b id="chat-count" style="margin-left:5px">0</b></div>
-            <div id="t-set" class="tab" onclick="nav('settings', this)"><span>⚙️ Налаштування</span></div>
-        </header>
+        <nav class="nav-bar">
+            <div class="nav-tab active" onclick="nav('support', this)">Підтримка <b id="chat-count">0</b></div>
+            <div id="t-settings" class="nav-tab" onclick="nav('settings', this)">Налаштування</div>
+        </nav>
 
-        <div class="app-shell">
-            <aside class="sidebar" id="side-panel">
-                <div style="padding:20px; border-bottom:1px solid #eee; background:#fff">
-                    <div id="greeting-txt" style="font-weight:800; font-size:13px;"></div>
+        <div class="app-main">
+            <aside class="side-panel" id="side-p">
+                <div style="padding:20px; background:rgba(255,255,255,0.5)">
+                    <div id="greet" style="font-weight:800; font-size:14px"></div>
                     <div style="display:flex; gap:8px; margin-top:15px">
-                        <button class="auth-btn" style="padding:8px; font-size:11px; flex:1" onclick="setMode('active')">АКТИВНІ</button>
-                        <button class="auth-btn" style="padding:8px; font-size:11px; flex:1; background:#666" onclick="setMode('archived')">АРХІВ</button>
+                        <button class="glass-btn" style="flex:1; font-size:10px; padding:10px" onclick="setMode('active')">АКТИВНІ</button>
+                        <button class="glass-btn" style="flex:1; font-size:10px; padding:10px; background:#666" onclick="setMode('archived')">АРХІВ</button>
                     </div>
                 </div>
-                <div id="chat-list" class="chat-list" style="flex:1; overflow-y:auto"></div>
-                <button onclick="logout()" style="padding:20px; color:red; border:none; background:none; font-weight:bold; cursor:pointer; width:100%; text-align:center;">🚪 Завершити роботу</button>
+                <div id="chat-list" style="flex:1; overflow-y:auto"></div>
+                <button onclick="logout()" style="padding:20px; color:red; border:none; background:none; font-weight:800; cursor:pointer; width:100%">🚪 Вийти</button>
             </aside>
 
-            <main class="viewport view-tab active" id="view-support">
-                <div class="top-nav">
-                    <button class="auth-btn" style="width:40px; height:40px; padding:0; background:#000; display:none" id="m-back" onclick="toggleSidebar(false)">‹</button>
-                    <b id="active-user-name" style="font-size:14px; margin-left:10px">Оберіть чат</b>
-                    <button style="margin-left:auto; border:none; background:none; color:var(--accent); font-weight:800; cursor:pointer;" onclick="archiveChat()">ЗАКРИТИ</button>
-                </div>
-                <div class="msg-area" id="support-msgs"></div>
-                <div id="scripts-chat-bar" class="scripts-bar"></div>
-                <form class="footer" onsubmit="sendMsg(event)">
-                    <input type="text" id="msg-input" placeholder="Ваша відповідь..." autocomplete="off">
-                    <button type="submit" style="background:#000; color:#fff; border:none; width:46px; height:46px; border-radius:50%; cursor:pointer; transition:0.2s;" id="send-btn">➤</button>
+            <main class="chat-viewport view-tab active" id="view-support">
+                <div class="messages-container" id="m-area"></div>
+                <div id="scripts-bar" style="display:flex; gap:8px; padding:10px; overflow-x:auto; background:rgba(255,255,255,0.4)"></div>
+                <form class="chat-footer" onsubmit="send(event)">
+                    <button type="button" class="glass-btn" style="width:45px; height:45px; padding:0; background:#000" onclick="toggleSide(true)">‹</button>
+                    <input type="text" id="msg-in" class="input-premium" placeholder="Напишіть повідомлення..." autocomplete="off">
+                    <button type="submit" class="glass-btn" style="width:50px; height:50px; padding:0; border-radius:50%">➤</button>
                 </form>
             </main>
 
-            <main class="viewport view-tab" id="view-settings" style="display:none; padding:20px; overflow-y:auto;">
-                <div class="set-card" id="admin-only-mgr">
-                    <h4>🤶 Керування менеджерами</h4>
-                    <div id="mgr-list"></div>
-                    <hr style="margin:20px 0; border:none; border-top:1px solid #eee">
-                    <input type="text" id="n-m-name" class="auth-input" placeholder="Ім'я">
-                    <input type="text" id="n-m-log" class="auth-input" placeholder="Логін">
-                    <input type="text" id="n-m-pas" class="auth-input" placeholder="Пароль">
-                    <input type="text" id="n-m-tg" class="auth-input" placeholder="Telegram Chat ID">
-                    <button class="auth-btn" onclick="addMgr()">СТВОРИТИ МЕНЕДЖЕРА</button>
-                </div>
-                <div class="set-card">
-                    <h4>🤖 FAQ та Скрипти</h4>
-                    <button class="auth-btn" onclick="addFAQRow()">+ Нове Питання</button>
-                    <button class="auth-btn" style="margin-top:10px" onclick="addScriptRow()">+ Новий Скрипт</button>
-                    <button class="auth-btn" style="margin-top:20px; background:#000" onclick="saveAllConfig()">ЗБЕРЕГТИ ВСЕ</button>
-                    <div id="config-editor" style="margin-top:20px"></div>
+            <main class="view-tab" id="view-settings" style="display:none; padding:30px; overflow-y:auto; flex:1; background:#fff">
+                <div style="max-width:600px">
+                    <h2>⚙️ Налаштування CRM</h2>
+                    <div class="auth-card" style="width:100%; text-align:left; margin-bottom:20px">
+                        <h4>Менеджери</h4>
+                        <div id="mgr-list"></div>
+                        <input type="text" id="nm" class="input-premium" placeholder="Ім'я" style="margin-top:10px">
+                        <input type="text" id="nl" class="input-premium" placeholder="Логін" style="margin-top:5px">
+                        <input type="text" id="np" class="input-premium" placeholder="Пароль" style="margin-top:5px">
+                        <input type="text" id="nt" class="input-premium" placeholder="Telegram ID" style="margin-top:5px">
+                        <button class="glass-btn" style="margin-top:15px; width:100%" onclick="addM()">Додати доступ</button>
+                    </div>
                 </div>
             </main>
+        </div>
+    </div>
+
+    <div id="modal-overlay" onclick="closeModal()">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <h3 style="margin:0 0 15px">Призначити адміна</h3>
+            <div id="mgr-options"></div>
         </div>
     </div>
 
@@ -159,97 +176,61 @@
     const db = firebase.database();
 
     let user = JSON.parse(localStorage.getItem('user'));
-    let curId = null, mode = 'active', managers = {}, scripts = [], faqs = [];
+    let curId = null, mode = 'active', managers = {};
 
-    // SOUND FUNCTIONS
-    function playClick() { document.getElementById('snd-click').currentTime=0; document.getElementById('snd-click').play().catch(()=>{}); }
-    function playSend() { document.getElementById('snd-send').currentTime=0; document.getElementById('snd-send').play().catch(()=>{}); }
+    // AUDIO ENGINE
+    const sounds = {
+        click: new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'),
+        send: new Audio('https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3')
+    };
 
-    // SNOW EFFECT
+    function initAudio() { Object.values(sounds).forEach(s => { s.play().then(()=>s.pause()); }); }
+    function playS(type) { sounds[type].currentTime=0; sounds[type].play().catch(()=>{}); }
+
+    // SNOW
     for(let i=0;i<25;i++){
         let s=document.createElement('div'); s.className='snowflake'; s.innerHTML='❄';
-        s.style.left=Math.random()*100+'vw'; s.style.animationDuration=(Math.random()*5+5)+'s';
-        document.getElementById('snow-container').appendChild(s);
+        s.style.left=Math.random()*100+'vw'; s.style.animationDuration=(Math.random()*5+10)+'s';
+        document.getElementById('snow-box').appendChild(s);
     }
 
-    function tryLogin() {
-        const l=document.getElementById('auth-l').value, p=document.getElementById('auth-p').value;
-        if(l==='admin' && p==='latiao2024') return loginOk({name:'Босс', role:'admin', id:'admin', tgId:'558890365'});
+    function login() {
+        const l=document.getElementById('al').value, p=document.getElementById('ap').value;
+        if(l==='admin' && p==='latiao2024') return logOk({name:'Власник', role:'admin', id:'admin', tg:'558890365'});
         db.ref('managers').once('value', snap => {
-            let f=false;
             snap.forEach(m => {
                 const d=m.val();
-                if(d.login===l && d.pass===p) { loginOk({name:d.name, role:'manager', id:m.key, tgId:d.tgId}); f=true; }
+                if(d.login===l && d.pass===p) logOk({name:d.name, role:'manager', id:m.key, tg:d.tgId});
             });
-            if(!f) alert('Помилка авторизації');
         });
     }
-
-    function loginOk(d) { localStorage.setItem('user', JSON.stringify(d)); location.reload(); }
+    function logOk(d) { localStorage.setItem('user', JSON.stringify(d)); location.reload(); }
     function logout() { localStorage.clear(); location.reload(); }
 
     if(user) {
         document.getElementById('auth-screen').style.display='none';
         document.getElementById('crm-ui').style.display='flex';
-        const hr = new Date().getHours();
-        document.getElementById('greeting-txt').innerText = `${hr<12?"Доброго ранку":hr<18?"Доброго дня":"Доброго вечора"}, ${user.name}! 🎄`;
-        if(user.role !== 'admin') document.getElementById('t-set').style.display='none';
-        if(window.innerWidth < 992) document.getElementById('m-back').style.display='block';
+        document.getElementById('greet').innerText = `Вітаємо, ${user.name}! 🎄`;
+        if(user.role !== 'admin') document.getElementById('t-settings').style.display='none';
         init();
     }
 
     function init() {
-        db.ref('managers').on('value', snap => { managers = snap.val() || {}; if(user.role==='admin') renderMgrList(); loadList(); });
-        db.ref('config').on('value', snap => {
-            const cfg = snap.val() || {};
-            scripts = cfg.scripts || []; faqs = cfg.faq || [];
-            renderScriptsToChat();
-            if(user.role==='admin') renderConfigEditors();
-        });
+        db.ref('managers').on('value', snap => { managers = snap.val() || {}; if(user.role==='admin') renderMgrs(); loadList(); });
         db.ref('active_chats').on('value', snap => {
             document.getElementById('chat-count').innerText = snap.numChildren();
-            smartAssign(snap.val());
             loadList();
         });
-        setInterval(checkEscalation, 60000);
-    }
-
-    // SMART LOGIC
-    function smartAssign(chats) {
-        if(!chats || new Date().getHours() < 8) return;
-        const av = Object.keys(managers).filter(id => managers[id].tgId);
-        if(user.role==='admin') av.push('admin');
-        if(av.length === 0) return;
-        Object.keys(chats).forEach(cid => {
-            if(!chats[cid].assignedTo) assign(cid, av[Math.floor(Math.random()*av.length)], "Авто-черга");
-        });
-    }
-
-    function checkEscalation() {
-        const now = Date.now();
-        db.ref('active_chats').once('value', snap => {
-            snap.forEach(c => {
-                const d = c.val();
-                if(d.assignedTo && d.assignedTo !== 'admin' && d.lastClientMsgTs && (now - d.lastClientMsgTs) > 300000) {
-                    assign(c.key, 'admin', "⚠️ Пропущено 5хв! Власник підключений");
-                }
+        db.ref('config/scripts').on('value', snap => {
+            const sc = snap.val() || [];
+            const bar = document.getElementById('scripts-bar'); bar.innerHTML = '';
+            sc.forEach(s => {
+                const b = document.createElement('button'); b.className='nav-tab'; b.innerText=s.title;
+                b.onclick=()=>document.getElementById('msg-in').value=s.text;
+                bar.appendChild(b);
             });
         });
     }
-
-    function assign(cid, mid, reason) {
-        const name = mid==='admin'?'Босс':managers[mid].name;
-        const tg = mid==='admin'?'558890365':managers[mid].tgId;
-        db.ref('active_chats/'+cid).update({ assignedTo: mid, assignedAt: Date.now() });
-        db.ref('support/'+cid).push({ text: `🧤 ${reason}: ${name}`, type: 'sys', ts: Date.now() });
-        if(tg) fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-            method:'POST', headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({chat_id: tg, text: `🔔 НОВИЙ ЧАТ!\nКлієнт: ${cid.substring(0,8)}\n${reason}`})
-        });
-    }
-
-    // UI RENDERERS
-    function toggleSidebar(show) { document.getElementById('side-panel').classList.toggle('hidden', !show); }
 
     function loadList() {
         const path = mode==='active'?'active_chats':'closed_chats';
@@ -258,98 +239,85 @@
             snap.forEach(c => {
                 const d = c.val();
                 if(user.role==='manager' && d.assignedTo && d.assignedTo !== user.id) return;
+
                 const div = document.createElement('div');
-                div.className = `chat-item ${curId===c.key?'active-chat':''}`;
-                const mName = d.assignedTo==='admin'?'Босс':(managers[d.assignedTo]?.name || 'Вільний');
-                div.innerHTML = `<strong>👤 ${c.key.substring(0,8)}</strong><br><small>${d.lastMsg||'...'}</small>
-                                 ${d.assignedTo?`<span class="tag-mgr">${mName}</span>`:''}`;
-                div.onclick = () => { 
-                    curId=c.key; openChat(c.key); 
-                    if(window.innerWidth<992) toggleSidebar(false); 
-                };
+                div.className = `chat-row ${curId===c.key?'selected':''}`;
+                const mName = d.assignedTo==='admin'?'Власник':(managers[d.assignedTo]?.name || '—');
+                
+                div.innerHTML = `
+                    <div style="font-weight:800; font-size:15px">👤 ${c.key.substring(0,8)}</div>
+                    <div style="font-size:12px; color:#888; margin-top:4px">${d.lastMsg || 'Немає повідомлень'}</div>
+                    ${d.assignedTo ? `<div style="font-size:10px; color:var(--accent); font-weight:800; margin-top:5px">🧤 ${mName}</div>` : ''}
+                `;
+
+                if(user.role==='admin') {
+                    const btn = document.createElement('button');
+                    btn.className = 'assign-trigger'; btn.innerHTML = '👤';
+                    btn.onclick = (e) => { e.stopPropagation(); openAssign(c.key); };
+                    div.appendChild(btn);
+                }
+
+                div.onclick = () => { curId=c.key; openChat(c.key); if(window.innerWidth<992) toggleSide(false); };
                 list.appendChild(div);
             });
         });
     }
 
+    function openAssign(cid) {
+        document.getElementById('modal-overlay').style.display='flex';
+        const opt = document.getElementById('mgr-options'); opt.innerHTML = `<div class="mgr-option" onclick="assign('${cid}','admin')">Власник</div>`;
+        Object.keys(managers).forEach(id => {
+            opt.innerHTML += `<div class="mgr-option" onclick="assign('${cid}','${id}')">${managers[id].name}</div>`;
+        });
+    }
+    function closeModal() { document.getElementById('modal-overlay').style.display='none'; }
+
+    function assign(cid, mid) {
+        const name = mid==='admin'?'Власник':managers[mid].name;
+        db.ref('active_chats/'+cid).update({assignedTo: mid});
+        db.ref('support/'+cid).push({text: `🧤 Призначено адміна: ${name}`, type:'sys', ts: Date.now()});
+        closeModal(); playS('click');
+    }
+
     function openChat(id) {
-        document.getElementById('active-user-name').innerText = "Клієнт: " + id.substring(0,8);
         const path = mode==='active'?'support/':'archive/';
         db.ref(path+id).on('value', snap => {
-            const area = document.getElementById('support-msgs'); area.innerHTML = '';
+            const area = document.getElementById('m-area'); area.innerHTML = '';
             snap.forEach(m => {
                 const d = m.val();
-                area.innerHTML += `<div class="bubble ${d.type}">${d.text}</div>`;
+                area.innerHTML += `<div class="msg ${d.type==='sys'?'sys':(d.type==='admin'||d.type==='out'?'out':'in')}">${d.text}</div>`;
             });
             area.scrollTop = area.scrollHeight;
         });
     }
 
-    function sendMsg(e) {
-        if(e) e.preventDefault(); 
-        const i = document.getElementById('msg-input');
+    function send(e) {
+        e.preventDefault(); const i=document.getElementById('msg-in');
         if(!curId || !i.value) return;
-        playSend();
-        db.ref('support/'+curId).push({ text: i.value, type: 'out', ts: Date.now() });
-        db.ref('active_chats/'+curId).update({ lastMsg: "Відповідь: "+i.value, lastClientMsgTs: null });
-        i.value = '';
+        playS('send');
+        db.ref('support/'+curId).push({text: i.value, type:'out', ts: Date.now()});
+        db.ref('active_chats/'+curId).update({lastMsg: "Ви: "+i.value});
+        i.value='';
     }
 
-    function renderScriptsToChat() {
-        const bar = document.getElementById('scripts-chat-bar'); bar.innerHTML = '';
-        scripts.forEach(s => {
-            const btn = document.createElement('button'); btn.className = 'script-btn'; btn.innerText = s.title;
-            btn.onclick = (e) => { e.stopPropagation(); document.getElementById('msg-input').value = s.text; };
-            bar.appendChild(btn);
-        });
-    }
-
-    function renderConfigEditors() {
-        const area = document.getElementById('config-editor'); area.innerHTML = '';
-        faqs.forEach((f, i) => {
-            area.innerHTML += `<div class="set-card"><b>FAQ Питання:</b><input class="auth-input" value="${f.q}" onchange="faqs[${i}].q=this.value"><textarea class="auth-input" onchange="faqs[${i}].a=this.value">${f.a}</textarea><button onclick="faqs.splice(${i},1);renderConfigEditors()" style="color:red;border:none;background:none;">Видалити</button></div>`;
-        });
-        scripts.forEach((s, i) => {
-            area.innerHTML += `<div class="set-card"><b>Скрипт Адміна:</b><input class="auth-input" value="${s.title}" onchange="scripts[${i}].title=this.value"><textarea class="auth-input" onchange="scripts[${i}].text=this.value">${s.text}</textarea><button onclick="scripts.splice(${i},1);renderConfigEditors()" style="color:red;border:none;background:none;">Видалити</button></div>`;
-        });
-    }
-
-    function saveAllConfig() { db.ref('config').set({faq: faqs, scripts: scripts}).then(()=>alert('Всі налаштування збережено! ❄️')); }
-    function addFAQRow() { faqs.push({q:'Нове питання', a:'Відповідь'}); renderConfigEditors(); }
-    function addScriptRow() { scripts.push({title:'Кнопка', text:'Текст'}); renderConfigEditors(); }
-
-    function renderMgrList() {
-        const l = document.getElementById('mgr-list'); l.innerHTML = '';
-        Object.keys(managers).forEach(id => {
-            l.innerHTML += `<div style="background:#f1f3f4; padding:12px; border-radius:15px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                <span><b>${managers[id].name}</b><br><small>TG: ${managers[id].tgId}</small></span>
-                <button onclick="db.ref('managers/${id}').remove()" style="color:red; border:none; background:none; cursor:pointer; font-size:18px;">✕</button>
-            </div>`;
-        });
-    }
-
-    function addMgr() {
-        const n=document.getElementById('n-m-name').value, l=document.getElementById('n-m-log').value, p=document.getElementById('n-m-pas').value, t=document.getElementById('n-m-tg').value;
-        if(n && l && p) db.ref('managers').push({name:n, login:l, pass:p, tgId:t});
-    }
-
+    function toggleSide(s) { document.getElementById('side-p').classList.toggle('hidden', !s); playS('click'); }
     function nav(t, el) {
         document.querySelectorAll('.view-tab').forEach(v=>v.style.display='none');
-        document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
         document.getElementById('view-'+t).style.display='flex'; el.classList.add('active');
-        if(t==='support') toggleSidebar(true);
+        playS('click');
     }
 
-    function setMode(m) { mode = m; loadList(); }
-    function archiveChat() {
-        if(!curId || !confirm('Архівувати діалог?')) return;
-        db.ref('support/'+curId).once('value', snap => {
-            db.ref('archive/'+curId).set(snap.val());
-            db.ref('closed_chats/'+curId).set({lastMsg: "Закрито", ts: Date.now()});
-            db.ref('support/'+curId).remove();
-            db.ref('active_chats/'+curId).remove();
-            curId = null; document.getElementById('support-msgs').innerHTML = '';
-            toggleSidebar(true);
+    function addM() {
+        const n=document.getElementById('nm').value, l=document.getElementById('nl').value, p=document.getElementById('np').value, t=document.getElementById('nt').value;
+        if(n && l && p) db.ref('managers').push({name:n, login:l, pass:p, tgId:t});
+    }
+    function renderMgrs() {
+        const l = document.getElementById('mgr-list'); l.innerHTML = '';
+        Object.keys(managers).forEach(id => {
+            l.innerHTML += `<div class="mgr-option" style="display:flex; justify-content:space-between; cursor:default">
+                <span>${managers[id].name}</span><button onclick="db.ref('managers/${id}').remove()" style="color:red;border:none;background:none">✕</button>
+            </div>`;
         });
     }
 </script>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Latiao Ultra CRM 2025</title>
+    <title>Latiao Ultra CRM | Advanced Control</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;800&display=swap" rel="stylesheet">
@@ -17,152 +17,143 @@
             --border: #e0e4e9;
             --text-primary: #1a1d21;
             --text-secondary: #5f6368;
+            --success: #34c759;
         }
 
         * { box-sizing: border-box; outline: none; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: var(--chrome-bg); color: var(--text-primary); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* --- CHROME TABS STYLE --- */
-        .chrome-tabs-container {
-            display: flex; align-items: flex-end; padding: 8px 8px 0 8px; gap: 4px; background: var(--chrome-bg);
-        }
+        /* --- CHROME TABS --- */
+        .chrome-tabs-container { display: flex; align-items: flex-end; padding: 8px 8px 0 8px; gap: 4px; background: var(--chrome-bg); }
         .chrome-tab {
-            position: relative; padding: 10px 25px; min-width: 180px; height: 38px;
+            position: relative; padding: 10px 25px; min-width: 160px; height: 38px;
             background: transparent; border-radius: 10px 10px 0 0;
             cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-secondary);
             display: flex; align-items: center; gap: 8px; transition: 0.2s;
         }
-        .chrome-tab:hover { background: rgba(255,255,255,0.4); }
-        .chrome-tab.active {
-            background: var(--chrome-tab); color: var(--accent); font-weight: 600;
-        }
-        /* Ефект закруглення кутів для активної вкладки (Chrome стиль) */
-        .chrome-tab.active::before, .chrome-tab.active::after {
-            content: ''; position: absolute; bottom: 0; width: 20px; height: 20px; background: transparent;
-        }
-        .chrome-tab.active::before { left: -20px; border-bottom-right-radius: 12px; box-shadow: 10px 0 0 0 var(--chrome-tab); }
-        .chrome-tab.active::after { right: -20px; border-bottom-left-radius: 12px; box-shadow: -10px 0 0 0 var(--chrome-tab); }
+        .chrome-tab.active { background: var(--chrome-tab); color: var(--accent); font-weight: 600; }
+        .chrome-tab.active::before { content: ''; position: absolute; bottom: 0; left: -20px; width: 20px; height: 20px; border-bottom-right-radius: 12px; box-shadow: 10px 0 0 0 var(--chrome-tab); }
+        .chrome-tab.active::after { content: ''; position: absolute; bottom: 0; right: -20px; width: 20px; height: 20px; border-bottom-left-radius: 12px; box-shadow: -10px 0 0 0 var(--chrome-tab); }
 
-        /* --- MAIN LAYOUT --- */
+        /* --- LAYOUT --- */
         .app-window { flex: 1; display: flex; background: var(--chrome-tab); position: relative; z-index: 10; overflow: hidden; }
         
-        /* Sidebar */
+        /* Sidebar Support Filters */
         .sidebar { width: 320px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-        .sidebar-header h3 { margin: 0; font-size: 16px; color: var(--accent); }
+        .support-filters { display: flex; padding: 10px; gap: 5px; border-bottom: 1px solid var(--border); }
+        .s-filter-btn { flex: 1; padding: 6px; font-size: 11px; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; background: #eee; color: #888; }
+        .s-filter-btn.active { background: var(--accent); color: #fff; }
 
         .chat-list { flex: 1; overflow-y: auto; padding: 8px; }
-        .chat-card {
-            padding: 12px 16px; border-radius: 12px; cursor: pointer; margin-bottom: 4px; transition: 0.2s;
-            border: 1px solid transparent;
-        }
-        .chat-card:hover { background: #edf1f7; }
+        .chat-card { padding: 12px 16px; border-radius: 12px; cursor: pointer; margin-bottom: 4px; border: 1px solid transparent; }
         .chat-card.active { background: var(--accent-soft); border-color: rgba(230,33,23,0.1); }
-        .chat-card strong { display: block; font-size: 14px; margin-bottom: 4px; }
-        .chat-card small { color: var(--text-secondary); font-size: 12px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         /* Workspace */
         .workspace { flex: 1; display: flex; flex-direction: column; background: #fff; }
         .workspace-header { padding: 15px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         
-        .messages-area { flex: 1; padding: 25px; overflow-y: auto; background: #fdfdfe; display: flex; flex-direction: column; gap: 12px; }
-        .bubble { padding: 10px 16px; border-radius: 16px; max-width: 70%; font-size: 14px; line-height: 1.5; }
-        .bubble.user { align-self: flex-start; background: #f1f3f4; color: var(--text-primary); border-bottom-left-radius: 4px; }
-        .bubble.admin { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; box-shadow: 0 4px 12px rgba(230,33,23,0.2); }
+        .messages-area { flex: 1; padding: 25px; overflow-y: auto; background: #fdfdfe; display: flex; flex-direction: column; gap: 10px; }
+        .bubble { padding: 10px 16px; border-radius: 16px; max-width: 75%; font-size: 14px; position: relative; }
+        .bubble.user { align-self: flex-start; background: #f1f3f4; }
+        .bubble.admin { align-self: flex-end; background: var(--accent); color: #fff; }
+        .del-msg { position: absolute; top: -5px; right: -5px; background: #000; color: #fff; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: none; align-items: center; justify-content: center; cursor: pointer; }
+        .bubble:hover .del-msg { display: flex; }
 
-        .input-bar { padding: 15px 25px; border-top: 1px solid var(--border); display: flex; gap: 12px; background: #fff; }
-        .input-bar input { flex: 1; padding: 12px 20px; border-radius: 20px; border: 1px solid var(--border); background: #f8f9fa; transition: 0.2s; }
-        .input-bar input:focus { border-color: var(--accent); background: #fff; }
-
-        /* Tools for Community */
+        /* Tools */
         .community-tools { width: 340px; border-left: 1px solid var(--border); background: var(--sidebar-bg); padding: 20px; overflow-y: auto; }
         .tool-card { background: #fff; border-radius: 16px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border); }
-        .tool-card h4 { margin: 0 0 12px 0; font-size: 12px; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.5px; }
+        .input-std { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 8px; font-size: 13px; }
+        .btn-main { background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; width: 100%; }
 
-        .btn-main { background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.2s; }
-        .btn-main:hover { opacity: 0.9; transform: translateY(-1px); }
-
-        .user-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
-        .status-dot { width: 8px; height: 8px; background: #34c759; border-radius: 50%; display: inline-block; margin-right: 5px; }
-
-        /* Auth */
+        /* Settings View */
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 40px; max-width: 1000px; }
+        
         #auth-gate { position: fixed; inset: 0; background: #fff; z-index: 99999; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
     <div class="chrome-tabs-container">
-        <div class="chrome-tab active" onclick="switchMainTab('support', this)">
-            <span>💬 Підтримка</span>
-        </div>
-        <div class="chrome-tab" onclick="switchMainTab('community', this)">
-            <span>🌶️ Спільнота</span>
-        </div>
-        <div class="chrome-tab" onclick="switchMainTab('stats', this)">
-            <span>📊 Статистика</span>
-        </div>
-        <div style="flex: 1;"></div>
-        <div style="padding-bottom: 8px; padding-right: 15px; font-size: 12px; color: #888;">Latiao Admin v2.5</div>
+        <div class="chrome-tab active" onclick="switchMainTab('support', this)"><span>💬 Підтримка</span></div>
+        <div class="chrome-tab" onclick="switchMainTab('community', this)"><span>🌶️ Спільнота</span></div>
+        <div class="chrome-tab" onclick="switchMainTab('settings', this)"><span>⚙️ Налаштування</span></div>
+        <div class="chrome-tab" onclick="switchMainTab('stats', this)"><span>📊 Статистика</span></div>
     </div>
 
     <div class="app-window">
         
         <aside class="sidebar" id="sidebar-panel">
-            <div class="sidebar-header">
-                <h3>Діалоги</h3>
-                <div id="online-count" style="font-size: 10px; background: #eee; padding: 2px 6px; border-radius: 10px;">0</div>
+            <div class="support-filters">
+                <button class="s-filter-btn active" id="f-act" onclick="toggleSupportMode('active')">Відкриті</button>
+                <button class="s-filter-btn" id="f-arc" onclick="toggleSupportMode('archived')">Архів</button>
             </div>
-            <div class="chat-list" id="chat-list-data">
-                </div>
+            <div class="chat-list" id="chat-list-data"></div>
         </aside>
 
         <main class="workspace tab-view active" id="view-support">
             <div class="workspace-header">
-                <b id="active-user-name">Оберіть чат підтримки</b>
-                <button class="btn-main" style="background: #333;" onclick="archiveChat()">В архів</button>
+                <b id="active-user-name">Оберіть діалог</b>
+                <button class="btn-main" style="width:auto; background:#333" onclick="archiveChat()">Закрити чат</button>
             </div>
             <div class="messages-area" id="support-msgs"></div>
-            <form class="input-bar" onsubmit="sendSupport(event)">
-                <input type="text" id="support-input" placeholder="Напишіть клієнту...">
-                <button type="submit" class="btn-main">Відправити</button>
+            <form class="input-bar" style="padding:15px; display:flex; gap:10px;" onsubmit="sendSupport(event)">
+                <input type="text" id="support-input" class="input-std" style="margin:0; border-radius:20px" placeholder="Відповідь клієнту...">
+                <button type="submit" class="btn-main" style="width:auto; border-radius:20px">➤</button>
             </form>
         </main>
 
         <main class="workspace tab-view" id="view-community" style="display:none; flex-direction: row;">
             <div style="flex: 1; display: flex; flex-direction: column;">
-                <div class="workspace-header"><b>Моніторинг чату клубу</b></div>
+                <div class="workspace-header"><b>Модерація Спільноти</b> <button class="btn-main" style="width:auto; background:red; font-size:10px" onclick="clearCommunity()">Очистити весь чат</button></div>
                 <div class="messages-area" id="community-msgs"></div>
-                <form class="input-bar" onsubmit="sendCommunity(event)">
-                    <input type="text" id="community-input" placeholder="Надіслати у спільноту як SHOP...">
-                    <button type="submit" class="btn-main" style="background: #000;">OK</button>
+                <form class="input-bar" style="padding:15px; display:flex; gap:10px;" onsubmit="sendCommunity(event)">
+                    <input type="text" id="community-input" class="input-std" style="margin:0; border-radius:20px" placeholder="Повідомлення від SHOP...">
+                    <button type="submit" class="btn-main" style="width:auto; border-radius:20px; background:#000">➤</button>
                 </form>
             </div>
             <aside class="community-tools">
                 <div class="tool-card">
-                    <h4>📢 Маркетинг</h4>
-                    <input type="text" id="ad-url" placeholder="URL фото" style="width:100%; margin-bottom:8px; padding:8px; border-radius:8px; border:1px solid #ddd;">
-                    <textarea id="ad-txt" placeholder="Текст акції..." style="width:100%; height:60px; padding:8px; border-radius:8px; border:1px solid #ddd;"></textarea>
-                    <button class="btn-main" style="width:100%; margin-top:10px;" onclick="pushAd()">Запустити рекламу</button>
-                </div>
-                <div class="tool-card">
-                    <h4>👥 Користувачі онлайн</h4>
+                    <h4>Юзери онлайн</h4>
                     <div id="online-users-list"></div>
                 </div>
                 <div class="tool-card">
-                    <h4>📊 Опитування</h4>
-                    <input type="text" id="poll-val" placeholder="Питання..." style="width:100%; padding:8px; border-radius:8px; border:1px solid #ddd;">
-                    <button class="btn-main" style="width:100%; margin-top:10px; background: #673ab7;" onclick="pushPoll()">Створити</button>
+                    <h4>Рекламна розсилка</h4>
+                    <input type="text" id="ad-url" class="input-std" placeholder="URL фото">
+                    <textarea id="ad-txt" class="input-std" placeholder="Текст..."></textarea>
+                    <button class="btn-main" onclick="pushAd()">Запустити</button>
                 </div>
             </aside>
+        </main>
+
+        <main class="workspace tab-view" id="view-settings" style="display:none; overflow-y:auto;">
+            <div class="settings-grid">
+                <div class="tool-card">
+                    <h4>Автоматизація чату</h4>
+                    <label style="font-size:12px">Автовідповідь при новому чаті:</label>
+                    <textarea id="set-welcome" class="input-std" placeholder="Вітаємо у Latiao! Чим допомогти?"></textarea>
+                    
+                    <label style="font-size:12px">Автозакриття чату через (хвилин):</label>
+                    <input type="number" id="set-close-time" class="input-std" value="60">
+                    
+                    <button class="btn-main" onclick="saveSettings()">Зберегти налаштування</button>
+                </div>
+                <div class="tool-card">
+                    <h4>База швидких відповідей (FAQ)</h4>
+                    <div id="faq-list-admin" style="margin-bottom:10px"></div>
+                    <input type="text" id="faq-q" class="input-std" placeholder="Питання">
+                    <input type="text" id="faq-a" class="input-std" placeholder="Відповідь">
+                    <button class="btn-main" style="background:#007aff" onclick="addFAQ()">Додати в чат клієнту</button>
+                </div>
+            </div>
         </main>
 
     </div>
 
     <div id="auth-gate">
-        <div style="text-align:center; width: 300px; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-            <h2 style="color: var(--accent);">Вхід</h2>
-            <input type="password" id="gate-pass" placeholder="Пароль" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd; margin-bottom:15px;">
-            <button class="btn-main" style="width:100%;" onclick="checkGate()">Увійти</button>
+        <div style="text-align:center; width: 320px; padding: 40px; border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); background:#fff">
+            <h2 style="color:var(--accent)">Latiao CRM</h2>
+            <input type="password" id="gate-pass" class="input-std" style="text-align:center" placeholder="Пароль">
+            <button class="btn-main" onclick="checkGate()">Увійти</button>
         </div>
     </div>
 
@@ -170,6 +161,9 @@
     const firebaseConfig = { databaseURL: "https://latiao-chat-default-rtdb.firebaseio.com" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+
+    let activeSupportId = null;
+    let supportMode = 'active';
 
     function checkGate() {
         if(document.getElementById('gate-pass').value === 'latiao2025') {
@@ -181,66 +175,65 @@
     function switchMainTab(view, el) {
         document.querySelectorAll('.tab-view').forEach(v => v.style.display = 'none');
         document.querySelectorAll('.chrome-tab').forEach(t => t.classList.remove('active'));
-        
-        if(view === 'support') document.getElementById('view-support').style.display = 'flex';
-        if(view === 'community') document.getElementById('view-community').style.display = 'flex';
-        
+        document.getElementById('view-' + view).style.display = (view === 'community' ? 'flex' : 'flex');
+        if(view === 'settings') document.getElementById('view-settings').style.display = 'block';
         el.classList.add('active');
         document.getElementById('sidebar-panel').style.display = (view === 'support') ? 'flex' : 'none';
     }
 
-    let activeSupportId = null;
+    function toggleSupportMode(mode) {
+        supportMode = mode;
+        document.querySelectorAll('.s-filter-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(mode === 'active' ? 'f-act' : 'f-arc').classList.add('active');
+        loadSupportList();
+    }
 
     function initCRM() {
-        // Завантаження списку підтримки
-        db.ref('active_chats').on('value', snap => {
-            const list = document.getElementById('chat-list-data');
-            list.innerHTML = '';
-            snap.forEach(child => {
-                const div = document.createElement('div');
-                div.className = `chat-card ${activeSupportId === child.key ? 'active' : ''}`;
-                div.innerHTML = `<strong>👤 ${child.key.substring(0,10)}</strong><small>${child.val().lastMsg || 'Новий діалог'}</small>`;
-                div.onclick = () => selectSupport(child.key);
-                list.appendChild(div);
-            });
-        });
-
-        // Завантаження спільноти
-        db.ref('messages').limitToLast(40).on('value', snap => {
+        loadSupportList();
+        // Спільнота
+        db.ref('messages').on('value', snap => {
             const area = document.getElementById('community-msgs');
             area.innerHTML = '';
             snap.forEach(c => {
                 const m = c.val();
                 const div = document.createElement('div');
                 div.className = `bubble ${m.uid === 'SHOP' ? 'admin' : 'user'}`;
-                div.innerHTML = `<small style="display:block;font-size:9px;opacity:0.6">${m.name}</small>${m.text}`;
+                div.innerHTML = `<div class="del-msg" onclick="deleteCommMsg('${c.key}')">✕</div><small style="display:block;font-size:9px;opacity:0.6">${m.name}</small>${m.text}`;
                 area.appendChild(div);
             });
             area.scrollTop = area.scrollHeight;
         });
 
-        // Юзери онлайн
+        // Онлайн юзери
         db.ref('presence').on('value', snap => {
             const list = document.getElementById('online-users-list');
-            const count = document.getElementById('online-count');
             list.innerHTML = '';
-            let i = 0;
             snap.forEach(child => {
-                i++;
                 const u = child.val();
-                list.innerHTML += `<div class="user-row">
-                    <span><span class="status-dot"></span>${u.name}</span>
-                    <button class="btn-main" style="padding:4px 8px; font-size:9px;" onclick="adminAction('${child.key}')">Дія</button>
-                </div>`;
+                list.innerHTML += `<div class="user-row"><span>${u.name}</span><button class="btn-main" style="width:auto; padding:2px 8px; font-size:9px" onclick="adminAction('${child.key}')">Дія</button></div>`;
             });
-            count.innerText = i;
+        });
+    }
+
+    function loadSupportList() {
+        const path = supportMode === 'active' ? 'active_chats' : 'closed_chats';
+        db.ref(path).on('value', snap => {
+            const list = document.getElementById('chat-list-data');
+            list.innerHTML = '';
+            snap.forEach(child => {
+                const div = document.createElement('div');
+                div.className = `chat-card ${activeSupportId === child.key ? 'active' : ''}`;
+                div.innerHTML = `<strong>👤 ${child.key.substring(0,10)}</strong><small>${child.val().lastMsg || '...'}</small>`;
+                div.onclick = () => selectSupport(child.key);
+                list.appendChild(div);
+            });
         });
     }
 
     function selectSupport(id) {
         activeSupportId = id;
-        document.getElementById('active-user-name').innerText = "Діалог: " + id;
-        db.ref('support/' + id).on('value', snap => {
+        const path = supportMode === 'active' ? 'support/' : 'archive/';
+        db.ref(path + id).on('value', snap => {
             const area = document.getElementById('support-msgs');
             area.innerHTML = '';
             snap.forEach(child => {
@@ -252,6 +245,7 @@
             });
             area.scrollTop = area.scrollHeight;
         });
+        loadSupportList();
     }
 
     function sendSupport(e) {
@@ -263,26 +257,54 @@
         input.value = '';
     }
 
+    function archiveChat() {
+        if(!activeSupportId) return;
+        db.ref('support/' + activeSupportId).once('value', snap => {
+            db.ref('archive/' + activeSupportId).set(snap.val());
+            db.ref('closed_chats/' + activeSupportId).set({ ts: Date.now(), lastMsg: "Діалог закрито" });
+            db.ref('support/' + activeSupportId).remove();
+            db.ref('active_chats/' + activeSupportId).remove();
+            activeSupportId = null;
+            document.getElementById('support-msgs').innerHTML = '';
+        });
+    }
+
+    // COMMUNITY MODERATION
+    function deleteCommMsg(id) { if(confirm('Видалити повідомлення?')) db.ref('messages/' + id).remove(); }
+    function clearCommunity() { if(confirm('ОЧИСТИТИ ВЕСЬ ЧАТ СПІЛЬНОТИ?')) db.ref('messages').remove(); }
+    
     function sendCommunity(e) {
         e.preventDefault();
-        const input = document.getElementById('community-input');
-        if(!input.value) return;
-        db.ref('messages').push({ uid: 'SHOP', name: 'ADMIN', text: input.value, ts: Date.now() });
-        input.value = '';
+        const val = document.getElementById('community-input').value;
+        if(val) db.ref('messages').push({ uid: 'SHOP', name: 'ADMIN', text: val, ts: Date.now() });
+        document.getElementById('community-input').value = '';
     }
 
     function pushAd() {
         const text = document.getElementById('ad-txt').value;
         const img = document.getElementById('ad-url').value;
-        if(text) db.ref('messages').push({ uid: 'SHOP', name: '🛍️ Latiao PROMO', text: text, img: img, ts: Date.now() });
+        if(text) db.ref('messages').push({ uid: 'SHOP', name: '🛍️ Latiao PROMO', text, img, ts: Date.now() });
+    }
+
+    // SETTINGS & FAQ
+    function saveSettings() {
+        const welcome = document.getElementById('set-welcome').value;
+        const time = document.getElementById('set-close-time').value;
+        db.ref('crm_settings').set({ welcomeText: welcome, autoCloseMin: time });
+        alert('Налаштування збережено!');
+    }
+
+    function addFAQ() {
+        const q = document.getElementById('faq-q').value;
+        const a = document.getElementById('faq-a').value;
+        if(q && a) db.ref('faq_base').push({ q, a });
+        document.getElementById('faq-q').value = '';
+        document.getElementById('faq-a').value = '';
     }
 
     window.adminAction = (uid) => {
         const act = prompt("1: Приват, 2: Запит №, 3: Бан");
-        if(act == "1") {
-            const m = prompt("Текст:");
-            db.ref('private_messages/' + uid).push({ text: m, ts: Date.now() });
-        }
+        if(act == "1") db.ref('private_messages/' + uid).push({ text: prompt("Текст:"), ts: Date.now() });
         if(act == "2") db.ref('presence/' + uid).update({ requirePhone: true });
         if(act == "3") db.ref('banned_users/' + uid).set({ ts: Date.now() });
     };

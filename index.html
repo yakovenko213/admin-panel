@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Latiao CRM PRO | Fixed UI</title>
+    <title>Latiao CRM PRO | Community Manager</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -23,7 +23,7 @@
         html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; position: fixed; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--chrome-bg); display: flex; flex-direction: column; }
 
-        /* TABS (Chrome Style) */
+        /* TABS */
         .chrome-header { 
             display: flex; align-items: flex-end; padding: 8px 8px 0; gap: 4px; 
             background: var(--chrome-bg); border-bottom: 1px solid #c1c3c8; flex-shrink: 0;
@@ -44,7 +44,6 @@
         /* LAYOUT */
         .app-shell { flex: 1; display: flex; background: #fff; overflow: hidden; position: relative; }
 
-        /* SIDEBAR + FILTERS */
         .sidebar { 
             width: 100%; height: 100%; background: var(--sidebar-bg); border-right: 1px solid var(--border); 
             display: flex; flex-direction: column; position: absolute; z-index: 100; 
@@ -53,37 +52,34 @@
         .sidebar.hidden { transform: translateX(-100%); }
         @media (min-width: 992px) { .sidebar { position: relative; width: 340px; transform: none !important; } }
 
-        .filter-area { padding: 12px; display: flex; gap: 8px; border-bottom: 1px solid var(--border); background: #fff; }
-        .chip { 
-            flex: 1; padding: 10px; border-radius: 12px; border: 1px solid var(--border); 
-            background: #fff; font-size: 11px; font-weight: 800; cursor: pointer; text-align: center;
-            display: flex; align-items: center; justify-content: center; gap: 5px;
-        }
+        .filter-area { padding: 12px; display: flex; gap: 8px; border-bottom: 1px solid var(--border); }
+        .chip { flex: 1; padding: 10px; border-radius: 12px; border: 1px solid var(--border); background: #fff; font-size: 11px; font-weight: 800; cursor: pointer; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-        .chip b { background: rgba(0,0,0,0.1); padding: 1px 5px; border-radius: 5px; font-size: 10px; }
 
         /* VIEWPORT */
         .viewport { flex: 1; display: flex; flex-direction: column; background: #fff; height: 100%; }
         .top-nav { padding: 10px 15px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; background: #fff; }
-        .back-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid #ddd; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .back-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         @media (min-width: 992px) { .back-btn { display: none; } }
 
         /* MESSAGES */
         .msg-area { flex: 1; padding: 15px; overflow-y: auto; background: #f4f6f8; display: flex; flex-direction: column; gap: 8px; }
-        .bubble { padding: 12px 16px; border-radius: 18px; max-width: 85%; font-size: 14px; line-height: 1.4; }
+        .bubble { padding: 12px 16px; border-radius: 18px; max-width: 85%; font-size: 14px; line-height: 1.4; position: relative; }
         .bubble.in { align-self: flex-start; background: #fff; border: 1px solid #eee; }
         .bubble.out { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+        .msg-del { position: absolute; top: -8px; right: -8px; width: 22px; height: 22px; background: #000; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; opacity: 0; transition: 0.2s; }
+        .bubble:hover .msg-del { opacity: 1; }
 
-        /* USER CARDS (СПІЛЬНОТА) */
+        /* USER CARDS */
         .user-mgmt { padding: 15px; overflow-y: auto; background: #fdfdfd; }
         .u-card { background: #fff; border: 1px solid var(--border); border-radius: 20px; padding: 15px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
         .u-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
         .u-avatar { width: 44px; height: 44px; border-radius: 14px; background: var(--accent-glow); color: var(--accent); font-weight: 800; display: flex; align-items: center; justify-content: center; position: relative; }
         .u-dot { position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; }
         .u-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-        .u-btn { border: none; padding: 10px; border-radius: 10px; font-size: 16px; cursor: pointer; background: #f1f3f4; }
+        .u-btn { border: none; padding: 10px; border-radius: 10px; font-size: 16px; cursor: pointer; background: #f1f3f4; display: flex; align-items: center; justify-content: center; }
 
-        /* INPUT FOOTER */
+        /* FOOTER */
         .footer { padding: 10px 15px; border-top: 1px solid var(--border); display: flex; gap: 10px; background: #fff; padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
         .footer input { flex: 1; height: 44px; padding: 0 18px; border-radius: 22px; border: 1px solid #eee; background: #f5f5f5; font-size: 16px; }
     </style>
@@ -161,7 +157,7 @@
         loadList();
     }
 
-    // COUNTERS
+    // ЛІЧИЛЬНИКИ
     db.ref('active_chats').on('value', snap => {
         const n = snap.numChildren();
         document.getElementById('b-total').innerText = n;
@@ -207,7 +203,7 @@
         i.value = '';
     }
 
-    // COMMUNITY
+    // СПІЛЬНОТА - ЮЗЕРИ
     db.ref('presence').on('value', snap => {
         const container = document.getElementById('u-cards'); container.innerHTML = '';
         snap.forEach(c => {
@@ -221,33 +217,36 @@
                     <div><b>${u.name||'Гість'}</b><br><small style="font-size:10px">${u.phone||'Без номера'}</small></div>
                 </div>
                 <div class="u-actions">
-                    <button class="u-btn" onclick="uAct('${c.key}','msg')">✉️</button>
-                    <button class="u-btn" onclick="uAct('${c.key}','phone')">📱</button>
-                    <button class="u-btn" onclick="uAct('${c.key}','ban')">🚫</button>
+                    <button class="u-btn" onclick="uAct('${c.key}','msg')" title="Приват">✉️</button>
+                    <button class="u-btn" onclick="uAct('${c.key}','phone')" title="Запит №">📱</button>
+                    <button class="u-btn" onclick="uAct('${c.key}','ban')" title="Бан">🚫</button>
                 </div>`;
             container.appendChild(card);
         });
     });
 
     function uAct(uid, t) {
-        if(t==='msg') { const m=prompt("Текст:"); if(m) db.ref('private_messages/'+uid).push({text:m, ts:Date.now()}); }
-        if(t==='phone') db.ref('presence/'+uid).update({requirePhone:true, phoneProvided:false});
-        if(t==='ban') if(confirm("Бан?")) db.ref('banned_users/'+uid).set({ts:Date.now()});
+        if(t==='msg') { const m=prompt("Текст приватного повідомлення:"); if(m) db.ref('private_messages/'+uid).push({text:m, ts:Date.now()}); }
+        if(t==='phone') { if(confirm("Надіслати запит на номер телефону?")) db.ref('presence/'+uid).update({requirePhone:true, phoneProvided:false}); }
+        if(t==='ban') { if(confirm("Забанити користувача?")) db.ref('banned_users/'+uid).set({ts:Date.now()}); }
     }
 
+    // СПІЛЬНОТА - ЧАТ
     function sendC(e) { e.preventDefault(); const i=document.getElementById('c-input'); if(i.value) db.ref('messages').push({uid:'SHOP', name:'ADMIN', text:i.value, ts:Date.now()}); i.value=''; }
-    db.ref('messages').limitToLast(20).on('value', snap => {
+    db.ref('messages').limitToLast(30).on('value', snap => {
         const area = document.getElementById('comm-msgs'); area.innerHTML = '';
         snap.forEach(c => {
             const m = c.val();
             const div = document.createElement('div');
             div.className = `bubble ${m.uid==='SHOP'?'out':'in'}`;
             div.style.alignSelf = m.uid==='SHOP'?'flex-end':'flex-start';
-            div.innerHTML = `<small style="display:block;font-size:9px;opacity:0.5">${m.name}</small>${m.text}`;
+            div.innerHTML = `<div class="msg-del" onclick="delM('${c.key}')">✕</div><small style="display:block;font-size:9px;opacity:0.5">${m.name}</small>${m.text}`;
             area.appendChild(div);
         });
         area.scrollTop = area.scrollHeight;
     });
+
+    function delM(mid) { if(confirm("Видалити це повідомлення?")) db.ref('messages/'+mid).remove(); }
 
     function archiveChat() {
         if(!curId) return;

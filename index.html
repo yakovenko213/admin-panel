@@ -3,90 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Latiao CRM PRO | Fix ❄️</title>
+    <title>Latiao Admin PRO | ❄️</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #e62117; --primary-grad: linear-gradient(135deg, #ff4b42 0%, #e62117 100%); --bg: #f8f9fb; --border: #e2e8f0; }
-        * { box-sizing: border-box; outline: none; }
-        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); height: 100vh; overflow: hidden; }
-        
-        /* Auth Screen */
-        #auth-screen { position: fixed; inset: 0; background: #1a1a1a; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: white; padding: 40px; border-radius: 30px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-        .input-p { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 12px; font-size: 16px; }
-        .btn-p { background: var(--primary-grad); color: white; border: none; border-radius: 12px; font-weight: 700; padding: 14px; width: 100%; cursor: pointer; }
-        
-        /* UI Structure */
-        #crm-ui { display: none; height: 100vh; flex-direction: column; }
-        header { background: #dee1e6; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; }
-        .tab { background: #bdc1c6; padding: 10px 20px; border-radius: 10px 10px 0 0; cursor: pointer; font-size: 13px; font-weight: 600; margin-right: 5px; }
+        :root {
+            --primary: #e62117;
+            --primary-grad: linear-gradient(135deg, #ff4b42 0%, #e62117 100%);
+            --chrome-bg: #dee1e6;
+            --chrome-tab: #ffffff;
+            --bg: #f8f9fb;
+            --border: #e2e8f0;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        body { 
+            margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); 
+            height: 100vh; overflow: hidden; color: #1a1a1a;
+        }
+
+        /* Декор */
+        body::after {
+            content: ""; position: fixed; inset: 0; pointer-events: none;
+            background-image: url('https://www.transparenttextures.com/patterns/snow.png');
+            opacity: 0.1; z-index: 9999;
+        }
+
+        /* Екран авторизації */
+        #auth-screen {
+            position: fixed; inset: 0; background: #1a1a1a;
+            z-index: 10000; display: flex; align-items: center; justify-content: center;
+        }
+        .auth-card {
+            background: white; padding: 40px; border-radius: 30px;
+            width: 90%; max-width: 380px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        /* Хедер Chrome */
+        header {
+            background: var(--chrome-bg); padding: 8px 12px 0;
+            display: flex; align-items: flex-end; gap: 4px; border-bottom: 1px solid #c1c4c8;
+        }
+        .tab {
+            background: #bdc1c6; padding: 10px 24px; border-radius: 12px 12px 0 0;
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s;
+            color: #5f6368; position: relative;
+        }
         .tab.active { background: white; color: var(--primary); }
-        
+
         .main-app { flex: 1; display: flex; overflow: hidden; background: white; }
-        aside { width: 320px; border-right: 1px solid #eee; display: flex; flex-direction: column; }
-        .chat-list { flex: 1; overflow-y: auto; }
-        .chat-item { padding: 15px; border-bottom: 1px solid #f5f5f5; cursor: pointer; transition: 0.2s; }
-        .chat-item.active { background: #fff1f0; border-left: 4px solid var(--primary); }
-        
+
+        /* Sidebar */
+        #sidebar {
+            width: 350px; border-right: 1px solid var(--border); display: flex; flex-direction: column;
+            background: #fff; flex-shrink: 0; transition: 0.3s ease;
+        }
+        .chat-row {
+            padding: 18px; border-bottom: 1px solid #f1f3f5; cursor: pointer;
+            transition: 0.2s; position: relative;
+        }
+        .chat-row:hover { background: #f8f9fa; }
+        .chat-row.active { background: #fff1f0; border-left: 4px solid var(--primary); }
+
+        /* Чат */
         #chat-view { flex: 1; display: flex; flex-direction: column; background: #f0f2f5 url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); }
-        .messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .bubble { padding: 10px 15px; border-radius: 18px; max-width: 75%; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .bubble.admin { align-self: flex-end; background: var(--primary-grad); color: white; border-bottom-right-radius: 2px; }
-        .bubble.user { align-self: flex-start; background: white; border-bottom-left-radius: 2px; }
+        .messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .bubble { 
+            max-width: 75%; padding: 12px 16px; border-radius: 20px; font-size: 14px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); line-height: 1.5;
+        }
+        .bubble.user { align-self: flex-start; background: white; }
+        .bubble.admin { align-self: flex-end; background: var(--primary-grad); color: white; }
         
-        .footer { padding: 15px; background: white; display: flex; gap: 10px; border-top: 1px solid #eee; }
-        .settings-view { flex: 1; padding: 30px; overflow-y: auto; display: none; }
+        .chat-footer { padding: 15px; background: rgba(255,255,255,0.9); display: flex; gap: 10px; backdrop-filter: blur(10px); }
+
+        /* Кнопки */
+        .btn { border: none; border-radius: 12px; font-weight: 700; cursor: pointer; padding: 12px 20px; transition: 0.2s; }
+        .btn-p { background: var(--primary-grad); color: white; }
+        .input-p { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 12px; }
+
+        .settings-view { flex: 1; padding: 40px; overflow-y: auto; display: none; }
+        .card { background: white; padding: 25px; border-radius: 20px; border: 1px solid var(--border); margin-bottom: 20px; }
+
+        @media (max-width: 850px) {
+            #sidebar { position: fixed; inset: 0; z-index: 500; width: 100%; }
+            #sidebar.hidden { transform: translateX(-100%); }
+        }
     </style>
 </head>
-<body>
+<body onclick="initAudio()">
 
     <div id="auth-screen">
         <div class="auth-card">
-            <h2 style="color: var(--primary)">Latiao CRM 🌶️</h2>
-            <p id="auth-msg" style="font-size: 12px; color: #888; margin-bottom: 20px;">Введіть дані доступу</p>
-            <input type="text" id="log-u" class="input-p" placeholder="Логін">
-            <input type="password" id="log-p" class="input-p" placeholder="Пароль">
-            <button class="btn-p" onclick="doAuth()">УВІЙТИ</button>
+            <h2 style="color: var(--primary)">Latiao CRM PRO 🌶️</h2>
+            <p id="auth-status" style="font-size: 13px; color: #888; margin-bottom: 25px;">Авторизація</p>
+            <input type="text" id="log-u" class="input-p" style="margin-bottom:10px" placeholder="Логін">
+            <input type="password" id="log-p" class="input-p" style="margin-bottom:20px" placeholder="Пароль">
+            <button class="btn btn-p" style="width: 100%" onclick="doLogin()">УВІЙТИ</button>
         </div>
     </div>
 
-    <div id="crm-ui">
+    <div id="crm-ui" style="display: none;">
         <header>
-            <div style="display:flex; align-items:flex-end">
-                <div style="font-weight: 800; color: var(--primary); margin-right: 30px; padding-bottom: 5px;">Latiao Admin</div>
-                <div id="t-chats" class="tab active" onclick="nav('chats')">Чати</div>
-                <div id="t-sets" class="tab" onclick="nav('settings')">Налаштування</div>
+            <div style="font-weight: 800; color: var(--primary); padding: 0 20px 12px; font-size: 18px;">Latiao Admin</div>
+            <div id="t-chats" class="tab active" onclick="nav('chats')">Чати</div>
+            <div id="t-sets" class="tab" onclick="nav('settings')">Налаштування</div>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 15px; padding-bottom: 12px; padding-right: 20px;">
+                <span id="mgr-greet" style="font-size: 12px; font-weight: 600;"></span>
+                <button onclick="logout()" style="border:none; background:none; color: #999; cursor:pointer; font-weight:700">Вихід</button>
             </div>
-            <button onclick="logout()" style="background:none; border:none; color:red; cursor:pointer; font-weight:700">Вихід</button>
         </header>
 
         <main class="main-app">
             <section id="view-chats" style="display: flex; width: 100%;">
-                <aside>
-                    <div id="chat-list-items" class="chat-list"></div>
+                <aside id="sidebar">
+                    <div style="padding: 15px; border-bottom: 1px solid #eee; display: flex; gap: 5px;">
+                        <button class="btn" style="flex:1; font-size: 11px; background:#f0f0f0" onclick="setF('active')">Активні</button>
+                        <button class="btn" style="flex:1; font-size: 11px; background:#f0f0f0" onclick="setF('closed')">Архів</button>
+                    </div>
+                    <div id="chat-list" style="flex:1; overflow-y:auto"></div>
                 </aside>
+
                 <div id="chat-view">
+                    <div style="background: white; padding: 10px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #eee;">
+                        <button class="btn" id="mob-back" onclick="toggleSide(true)" style="display:none; padding:8px; background:#eee">←</button>
+                        <b id="chat-title">Оберіть чат</b>
+                        <div style="margin-left: auto; display: flex; gap: 10px;">
+                            <button class="btn" style="background:#f1f5f9; font-size:11px" onclick="askPhone()">Запит номера</button>
+                            <button class="btn" style="background:#fee2e2; color:#b91c1c; font-size:11px" onclick="closeChat()">Закрити</button>
+                        </div>
+                    </div>
                     <div class="messages" id="msg-area"></div>
-                    <div class="footer">
-                        <input type="text" id="adm-input" class="input-p" style="margin:0" placeholder="Ваша відповідь..." onkeypress="if(event.key==='Enter') sendMsg()">
-                        <button class="btn-p" style="width: 60px" onclick="sendMsg()">➤</button>
+                    <div class="chat-footer">
+                        <button class="btn" style="background:#f1f5f9; width:45px; height:45px; padding:0" onclick="showQuick()">⚡</button>
+                        <input type="text" id="adm-input" class="input-p" placeholder="Ваша відповідь..." onkeypress="if(event.key==='Enter') sendMsg()">
+                        <button class="btn btn-p" onclick="sendMsg()">➤</button>
                     </div>
                 </div>
             </section>
 
             <section id="view-settings" class="settings-view">
-                <h2>Налаштування</h2>
-                <div style="background:white; padding:20px; border-radius:15px; border:1px solid #eee">
-                    <h3>Менеджери</h3>
-                    <div id="mgr-list"></div>
-                    <div style="margin-top:20px; display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px">
-                        <input type="text" id="nm-n" class="input-p" placeholder="Ім'я">
-                        <input type="text" id="nm-l" class="input-p" placeholder="Логін">
-                        <input type="text" id="nm-p" class="input-p" placeholder="Пароль">
+                <div style="max-width: 800px; margin: 0 auto;">
+                    <div class="card">
+                        <h3>🔧 Віджет чату</h3>
+                        <button class="btn btn-p" onclick="setWidget(true)">Увімкнути на сайті</button>
+                        <button class="btn" onclick="setWidget(false)">Вимкнути</button>
                     </div>
-                    <button class="btn-p" style="margin-top:10px; width:200px" onclick="addM()">Додати</button>
+                    <div class="card">
+                        <h3>🧤 Менеджери</h3>
+                        <div id="mgr-list"></div>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-top:15px">
+                            <input type="text" id="nm-n" class="input-p" placeholder="Ім'я">
+                            <input type="text" id="nm-l" class="input-p" placeholder="Логін">
+                            <input type="text" id="nm-p" class="input-p" placeholder="Пароль">
+                        </div>
+                        <button class="btn btn-p" style="margin-top:10px" onclick="addM()">Додати</button>
+                    </div>
                 </div>
             </section>
         </main>
@@ -98,63 +172,60 @@
     const db = firebase.database();
 
     let user = JSON.parse(localStorage.getItem('latiao_session'));
-    let curId = null;
+    let curId = null, filter = 'active';
 
-    // ПРИМУСОВА АВТОРИЗАЦІЯ
-    function doAuth() {
+    // ГАРАНТОВАНИЙ ВХІД
+    function doLogin() {
         const u = document.getElementById('log-u').value;
         const p = document.getElementById('log-p').value;
 
-        // 1. Супер-вхід (Пріоритет)
         if (u === "admin" && p === "latiao2024") {
-            const adminData = { name: "Власник", login: "admin", role: "admin" };
-            db.ref('managers/admin_root').update(adminData); // Оновлюємо в базі про всяк випадок
-            loginSuccess(adminData);
-            return;
-        }
-
-        // 2. Перевірка через базу для інших менеджерів
-        db.ref('managers').once('value', snap => {
-            let found = false;
-            snap.forEach(m => {
-                const d = m.val();
-                if(d.login === u && d.password === p) {
-                    loginSuccess(d);
-                    found = true;
-                }
+            const admin = { name: "Власник", role: "admin", login: "admin" };
+            db.ref('managers/admin_root').update({ ...admin, password: "latiao2024" });
+            loginSuccess(admin);
+        } else {
+            db.ref('managers').once('value', snap => {
+                let found = false;
+                snap.forEach(m => {
+                    if (m.val().login === u && m.val().password === p) {
+                        loginSuccess(m.val());
+                        found = true;
+                    }
+                });
+                if (!found) alert("Невірний пароль!");
             });
-            if(!found) {
-                document.getElementById('auth-msg').innerText = "Невірний логін або пароль!";
-                document.getElementById('auth-msg').style.color = "red";
-            }
-        });
+        }
     }
 
-    function loginSuccess(userData) {
-        user = userData;
+    function loginSuccess(data) {
+        user = data;
         localStorage.setItem('latiao_session', JSON.stringify(user));
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('crm-ui').style.display = 'flex';
-        startApp();
+        initApp();
     }
 
     function logout() { localStorage.clear(); location.reload(); }
 
-    if(user) loginSuccess(user);
+    if (user) loginSuccess(user);
 
-    function startApp() {
+    function initApp() {
+        const h = new Date().getHours();
+        const greet = h < 6 ? "Доброї ночі" : h < 12 ? "Доброго ранку" : h < 18 ? "Доброго дня" : "Доброго вечора";
+        document.getElementById('mgr-greet').innerText = `${greet}, ${user.name}`;
+        
         db.ref('active_chats').on('value', renderList);
         if(user.role === 'admin') db.ref('managers').on('value', renderMgrs);
     }
 
     function renderList() {
         db.ref('active_chats').once('value', snap => {
-            const cont = document.getElementById('chat-list-items');
+            const cont = document.getElementById('chat-list');
             cont.innerHTML = '';
             snap.forEach(c => {
                 const div = document.createElement('div');
-                div.className = `chat-item ${curId === c.key ? 'active' : ''}`;
-                div.innerHTML = `<b>Клієнт ${c.key.substring(0,6)}</b><br><small>${c.val().lastMsg || ''}</small>`;
+                div.className = `chat-row ${curId === c.key ? 'active' : ''}`;
+                div.innerHTML = `<b>👤 Клієнт ${c.key.substring(0,8)}</b><br><small>${c.val().lastMsg || '...'}</small>`;
                 div.onclick = () => selectChat(c.key);
                 cont.appendChild(div);
             });
@@ -163,13 +234,15 @@
 
     function selectChat(id) {
         curId = id;
-        db.ref('support/' + id).on('value', snap => {
+        if(window.innerWidth < 850) { document.getElementById('sidebar').classList.add('hidden'); document.getElementById('mob-back').style.display='block'; }
+        document.getElementById('chat-title').innerText = "Чат: " + id.substring(0,8);
+        
+        db.ref(`support/${id}`).on('value', snap => {
             if(curId !== id) return;
             const area = document.getElementById('msg-area');
             area.innerHTML = '';
             snap.forEach(m => {
-                const d = m.val();
-                area.innerHTML += `<div class="bubble ${d.type}">${d.text}</div>`;
+                area.innerHTML += `<div class="bubble ${m.val().type}">${m.val().text}</div>`;
             });
             area.scrollTop = area.scrollHeight;
         });
@@ -179,32 +252,34 @@
     function sendMsg() {
         const inp = document.getElementById('adm-input');
         if(!curId || !inp.value.trim()) return;
-        const txt = inp.value;
-        db.ref('support/' + curId).push({ text: txt, type: 'admin', ts: Date.now() });
-        db.ref('active_chats/' + curId).update({ lastMsg: "Ви: " + txt, ts: Date.now() });
+        db.ref(`support/${curId}`).push({ text: inp.value, type: 'admin', ts: Date.now() });
+        db.ref(`active_chats/${curId}`).update({ lastMsg: "Ви: " + inp.value, ts: Date.now() });
         inp.value = '';
     }
 
     function nav(v) {
-        document.getElementById('view-chats').style.display = v === 'chats' ? 'flex' : 'none';
-        document.getElementById('view-settings').style.display = v === 'settings' ? 'block' : 'none';
+        document.getElementById('view-chats').style.display = v==='chats'?'flex':'none';
+        document.getElementById('view-settings').style.display = v==='settings'?'block':'none';
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.getElementById('t-' + (v==='chats'?'chats':'sets')).classList.add('active');
     }
 
+    function toggleSide(v) { document.getElementById('sidebar').classList.toggle('hidden', !v); if(v) document.getElementById('mob-back').style.display='none'; }
+    function setWidget(v) { db.ref('config/chat_enabled').set(v); alert("Оновлено!"); }
+    function askPhone() { document.getElementById('adm-input').value = "Залиште свій номер телефону для зв'язку."; sendMsg(); }
+    function closeChat() { if(!curId || !confirm("Закрити?")) return; db.ref(`active_chats/${curId}`).remove(); curId = null; renderList(); }
+
     function renderMgrs(snap) {
-        const list = document.getElementById('mgr-list');
-        list.innerHTML = '';
-        snap.forEach(m => {
-            const d = m.val();
-            list.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee">${d.name} (${d.login})</div>`;
-        });
+        const list = document.getElementById('mgr-list'); list.innerHTML = '';
+        snap.forEach(m => { list.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee">${m.val().name} (${m.val().login})</div>`; });
     }
 
     function addM() {
-        const n = document.getElementById('nm-n').value, l = document.getElementById('nm-l').value, p = document.getElementById('nm-p').value;
-        if(n && l && p) db.ref('managers').push({name:n, login:l, password:p, role:'manager'});
+        const n=document.getElementById('nm-n').value, l=document.getElementById('nm-l').value, p=document.getElementById('nm-p').value;
+        if(n && l && p) db.ref('managers').push({ name:n, login:l, password:p, role:'manager' });
     }
+
+    function initAudio() {}
 </script>
 </body>
 </html>
